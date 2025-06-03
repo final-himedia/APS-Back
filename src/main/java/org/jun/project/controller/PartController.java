@@ -2,7 +2,6 @@ package org.jun.project.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.jun.project.entity.Part;
-import org.jun.project.entity.PartId;
 import org.jun.project.repository.PartRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;

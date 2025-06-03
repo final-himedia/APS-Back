@@ -1,9 +1,6 @@
 package org.jun.project.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,17 +15,8 @@ import java.time.LocalDateTime;
 @Table(name = "part")
 public class Part {
 
-    @Id
-    @Column(name = "SITE_ID")
-    private String siteId;
-
-    @Id
-    @Column(name = "PART_ID")
-    private String partId;
-
-    @Id
-    @Column(name = "PART_TYPE")
-    private String partType;
+    @EmbeddedId
+    private PartId partId;
 
     @Column(name = "SCENARIO_ID")
     private String scenarioId;

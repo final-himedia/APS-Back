@@ -19,9 +19,8 @@ public class PartController {
     private final PartRepository partRepository;
 
     // 전체 자재 목록을 조회하는 API
-    @GetMapping("/api/part")
-    public ResponseEntity<?> allParts() {
-
+    @GetMapping("/api/part/{partId}")
+    public ResponseEntity<?> partIdHandle() {
         List<Part> parts = partRepository.findAll();
 
         // 응답 데이터를 담을 Map 생성
@@ -30,7 +29,7 @@ public class PartController {
         response.put("parts", parts);         // 자재 목록
         response.put("total", parts.size());  // 총 개수
 
-        return ResponseEntity.status(200).body(null);
+        return ResponseEntity.status(200).body(response);
 
     }
 }

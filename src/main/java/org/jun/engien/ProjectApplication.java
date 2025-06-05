@@ -1,4 +1,4 @@
-package org.jun.project;
+package org.jun.engien;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

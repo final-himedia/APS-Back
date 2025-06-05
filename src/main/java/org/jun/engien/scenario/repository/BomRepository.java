@@ -1,7 +1,7 @@
-package org.jun.project.repository;
+package org.jun.engien.scenario.repository;
 
-import org.jun.project.entity.Bom;
-import org.jun.project.entity.BomId;
+import org.jun.engien.scenario.entity.Bom;
+import org.jun.engien.scenario.entity.BomId;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

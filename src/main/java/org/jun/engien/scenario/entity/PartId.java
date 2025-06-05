@@ -1,4 +1,4 @@
-package org.jun.project.entity;
+package org.jun.engien.scenario.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

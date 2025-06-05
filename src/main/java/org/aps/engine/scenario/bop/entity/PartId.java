@@ -16,4 +16,5 @@ public class PartId implements Serializable {
     private String siteId;
     private String partId;
     private String partType;
+
 }

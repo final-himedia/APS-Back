@@ -1,0 +1,4 @@
+package org.aps.common.controller;
+
+public class BookmarkController {
+}

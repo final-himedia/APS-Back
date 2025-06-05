@@ -1,4 +1,4 @@
-package org.jun.engien.scenario.entity;
+package org.jun.engien.scenario.config.entity;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

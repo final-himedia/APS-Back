@@ -1,7 +1,6 @@
-package org.jun.engien.scenario.entity;
+package org.jun.engien.scenario.target.entity;
 
 import jakarta.persistence.Embeddable;
-
 import lombok.*;
 
 import java.io.Serializable;

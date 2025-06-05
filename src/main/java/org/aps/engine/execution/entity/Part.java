@@ -5,6 +5,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.aps.engine.execution.ㄷ.PartId;
 
 import java.time.LocalDateTime;
 

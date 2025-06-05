@@ -1,8 +1,8 @@
-package org.jun.project.controller;
+package org.jun.engien.scenario.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.jun.project.entity.Bom;
-import org.jun.project.repository.BomRepository;
+import org.jun.engien.scenario.entity.Bom;
+import org.jun.engien.scenario.repository.BomRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,11 +1,11 @@
-package org.aps.engine.scenario.resource.controller;
+package org.aps.engine.result.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/scenarios")
+@RequestMapping("/api/run")
 @RequiredArgsConstructor
-public class ResourceController {
+public class ResultController {
 }

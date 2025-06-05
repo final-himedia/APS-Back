@@ -1,11 +1,11 @@
-package org.aps.engine.scenario.resource.controller;
+package org.aps.engine.schedule.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/scenarios")
+@RequestMapping("/api/schedule")
 @RequiredArgsConstructor
-public class ResourceController {
+public class ScheduleController {
 }

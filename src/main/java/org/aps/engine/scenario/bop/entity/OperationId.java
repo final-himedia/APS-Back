@@ -1,10 +1,10 @@
 package org.aps.engine.scenario.bop.entity;
 
+
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.io.Serializable;
-
 
 @Embeddable
 @Setter
@@ -12,9 +12,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PartId implements Serializable {
+public class OperationId implements Serializable {
     private String siteId;
-    private String partId;
-    private String partType;
-
+    private String OperationId;
 }

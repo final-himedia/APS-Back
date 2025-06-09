@@ -15,14 +15,14 @@ import lombok.*;
 public class Routing {
 
     @EmbeddedId
-    private RoutingId RoutingId;
-    private String Description;
-    private String ScenarioId;
-    private String RoutingName;
-    private String CreateDatetime;
-    private String CreateBy;
-    private String UpdateDatetime;
-    private String UpdateBy;
-    private String RoutingType;
+    private RoutingId routingId;
+    private String description;
+    private String scenarioId;
+    private String routingName;
+    private String createDatetime;
+    private String createBy;
+    private String updateDatetime;
+    private String updateBy;
+    private String routingType;
 
 }

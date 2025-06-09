@@ -10,6 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoutingId {
-    private String SiteId;
-    private String RoutingId;
+    private String siteId;
+    private String routingId;
 }

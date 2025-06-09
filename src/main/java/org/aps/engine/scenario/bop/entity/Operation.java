@@ -17,20 +17,20 @@ public class Operation {
 
     @EmbeddedId
     private OperationId operationId;
-    private String ScenarioId;
-    private String OperationName;
-    private String RunTime;
-    private String RunTimeUom;
-    private String Yield;
-    private String WaitTime;
-    private String WaitTimeUom;
-    private String TransferTime;
-    private String TransferTimeUom;
-    private String OperationSeq;
-    private String OperationType;
-    private String SourcingType;
-    private String CreateDatetime;
-    private String CreateBy;
-    private String UpdateDatetime;
-    private String UpdateBy;
+    private String scenarioId;
+    private String operationName;
+    private String runTime;
+    private String runTimeUom;
+    private String yield;
+    private String waitTime;
+    private String waitTimeUom;
+    private String transferTime;
+    private String transferTimeUom;
+    private String operationSeq;
+    private String operationType;
+    private String sourcingType;
+    private String createDatetime;
+    private String createBy;
+    private String updateDatetime;
+    private String updateBy;
 }

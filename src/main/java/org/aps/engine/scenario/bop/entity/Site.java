@@ -15,16 +15,16 @@ import lombok.*;
 public class Site {
 
     @Id
-    private String SiteId;
-    private String ScenarioId;
-    private String SiteName;
-    private String CreateDatetime;
-    private String CreateBy;
-    private String UpdateDatetime;
-    private String UpdateBy;
-    private String InterfaceDate;
-    private String InterfaceTime;
-    private String InterfaceType;
-    private String InterfaceText;
+    private String siteId;
+    private String scenarioId;
+    private String siteName;
+    private String createDatetime;
+    private String createBy;
+    private String updateDatetime;
+    private String updateBy;
+    private String interfaceDate;
+    private String interfaceTime;
+    private String interfaceType;
+    private String interfaceText;
 
 }

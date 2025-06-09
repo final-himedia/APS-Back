@@ -14,5 +14,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class OperationId implements Serializable {
     private String siteId;
-    private String OperationId;
+    private String operationId;
 }

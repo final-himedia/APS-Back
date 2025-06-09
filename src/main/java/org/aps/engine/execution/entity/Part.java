@@ -5,7 +5,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
-import org.aps.engine.execution.ㄷ.PartId;
+
 
 import java.time.LocalDateTime;
 
@@ -19,8 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "part")
 public class Part {
 
-    @EmbeddedId
-    private PartId partId;
+
 
     @Column(name = "SCENARIO_ID")
     private String scenarioId;

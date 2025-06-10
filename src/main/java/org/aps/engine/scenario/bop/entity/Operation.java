@@ -17,6 +17,7 @@ public class Operation {
 
     @EmbeddedId
     private OperationId operationId;
+
     private String scenarioId;
     private String operationName;
     private String runTime;
@@ -29,8 +30,4 @@ public class Operation {
     private String operationSeq;
     private String operationType;
     private String sourcingType;
-    private String createDatetime;
-    private String createBy;
-    private String updateDatetime;
-    private String updateBy;
 }

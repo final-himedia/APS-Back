@@ -1,25 +1,32 @@
 package org.aps.engine.scenario.bop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
-import org.aps.engine.execution.entity.Part;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "demand")
 public class Demand {
-    @Id
-    private Long id;
-    @ManyToOne
-    private Part part;
 
-    private Integer quantity;
-    private LocalDate dueDate;
+    @EmbeddedId
+    private DemandId demandId;
+
+    private String scenarioId;
+    private String partName;
+    private String customerId;
+    private LocalDateTime dueDate;
+    private Double demandQty;
+    private Float priority;
+    private String uom;
+    private String orderType;
+    private String orderTypeName;
+    private String exceptYn;
+    private LocalDateTime headerCreationDate;
+    private Boolean hasOverActQty;
 }

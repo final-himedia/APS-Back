@@ -11,7 +11,9 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoutingId implements Serializable {
+public class OperationRoutingId implements Serializable {
     private String siteId;
     private String routingId;
+    private String operationId;
+    private Integer operationSeq;
 }

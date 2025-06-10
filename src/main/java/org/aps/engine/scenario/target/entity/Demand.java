@@ -1,6 +1,8 @@
-package org.aps.engine.scenario.bop.entity;
+package org.aps.engine.scenario.target.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;

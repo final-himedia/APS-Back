@@ -13,10 +13,9 @@ import lombok.*;
 @NoArgsConstructor
 @Table(name = "tool_master")
 public class ToolMaster {
-
     @Id
-    private String siteId;
     private String toolId;
+    private String siteId;
     private String toolState;
     private Integer toolCavity;
     private String scenarioId;

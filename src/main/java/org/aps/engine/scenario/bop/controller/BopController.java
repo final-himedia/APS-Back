@@ -28,12 +28,11 @@ public class BopController {
     private final OperationRoutingRepository operationRoutingRepository;
     private final BomService bomService;
     private final RoutingService routingService;
-    private final DemandService demandService;
+
     private final OperationService operationService;
     private final OperationRoutingService operationRoutingService;
     private final PartService partService;
     private final SiteService siteService;
-    private final DemandRepository demandRepository;
 
 
     @GetMapping("/routing")
@@ -111,19 +110,6 @@ public class BopController {
 
     }
 
-    @GetMapping("/demand")
-    public ResponseEntity<?> getAllDemand() {
-        List<Demand> demands = demandRepository.findAll();
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", 200);
-        response.put("demands", demands);
-        response.put("total", demands.size());
-
-        return ResponseEntity.status(200).body(response);
-
-    }
-
 
     @PostMapping("/bom-upload")
     public ResponseEntity<String> uploadBomExcel(@RequestParam("file") MultipartFile file) throws IOException {
@@ -136,16 +122,7 @@ public class BopController {
         bomService.exportBomExcel(response);
     }
 
-    @PostMapping("/demand-upload")
-    public ResponseEntity<String > uploadDemandExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        demandService.excelHandle(file);
-        return ResponseEntity.ok("엑셀 업로드 완료");
-    }
 
-    @GetMapping("/demand-download")
-    private void downloadDemandExcel(HttpServletResponse response) throws IOException {
-        demandService.exportDemandExcel(response);
-    }
     @PostMapping("/operation-upload")
     public ResponseEntity<String > uploadOperationExcel(@RequestParam("file") MultipartFile file) throws IOException {
         operationService.excelHandle(file);

@@ -1,4 +1,4 @@
-package org.aps.engine.scenario.bop.service;
+package org.aps.engine.scenario.target.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +7,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aps.engine.scenario.bop.entity.Demand;
-import org.aps.engine.scenario.bop.entity.DemandId;
-import org.aps.engine.scenario.bop.entity.PartId;
-import org.aps.engine.scenario.bop.repository.DemandRepository;
+import org.aps.engine.scenario.target.entity.Demand;
+import org.aps.engine.scenario.target.entity.DemandId;
+import org.aps.engine.scenario.target.repository.DemandRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

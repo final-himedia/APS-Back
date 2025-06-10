@@ -29,8 +29,4 @@ public class Operation {
     private String operationSeq;
     private String operationType;
     private String sourcingType;
-    private String createDatetime;
-    private String createBy;
-    private String updateDatetime;
-    private String updateBy;
 }

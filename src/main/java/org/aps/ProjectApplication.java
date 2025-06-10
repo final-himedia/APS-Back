@@ -1,4 +1,4 @@
-package org.aps.engine;
+package org.aps;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

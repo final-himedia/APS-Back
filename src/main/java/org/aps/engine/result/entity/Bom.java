@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
-@Entity
+@Entity(name = "ResultBom")
 @Setter
 @Getter
 @Builder

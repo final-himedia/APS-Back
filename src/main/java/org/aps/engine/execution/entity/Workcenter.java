@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 
-@Entity
+@Entity(name = "ExecutionWorkcenter")
 @Setter
 @Getter
 @Builder

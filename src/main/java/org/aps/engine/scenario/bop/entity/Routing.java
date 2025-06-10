@@ -19,10 +19,5 @@ public class Routing {
     private String description;
     private String scenarioId;
     private String routingName;
-    private String createDatetime;
-    private String createBy;
-    private String updateDatetime;
-    private String updateBy;
     private String routingType;
-
 }

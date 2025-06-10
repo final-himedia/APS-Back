@@ -1,10 +1,9 @@
-package org.aps.analysis.entity;
+package org.aps.engine.scenario.bop.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.io.Serializable;
-
 
 @Embeddable
 @Setter
@@ -12,8 +11,8 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PartId implements Serializable {
+public class DemandId implements Serializable {
+    private String demandId;
     private String siteId;
     private String partId;
-    private String partType;
 }

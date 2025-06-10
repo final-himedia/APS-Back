@@ -18,7 +18,6 @@ import java.util.List;
 public class BomService {
     private final BomRepository bomRepository;
 
-    // ✅ 업로드: 엑셀 데이터를 DB에 저장
     public void excelHandle(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -52,14 +51,12 @@ public class BomService {
         }
     }
 
-    // ✅ 다운로드: DB에서 데이터를 꺼내 엑셀로 응답
     public void exportBomExcel(HttpServletResponse response) throws IOException {
         List<Bom> boms = bomRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("BOM");
 
-        // 헤더
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("to_site_id");
         header.createCell(1).setCellValue("to_part_id");
@@ -100,7 +97,6 @@ public class BomService {
             row.createCell(15).setCellValue(bom.getToPartLevel());
         }
 
-        // 응답 설정
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=bom_export.xlsx");
 

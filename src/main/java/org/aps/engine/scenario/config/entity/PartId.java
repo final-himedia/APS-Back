@@ -1,4 +1,4 @@
-package org.aps.engine.schedule.entity;
+package org.aps.engine.scenario.config.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
@@ -16,4 +16,5 @@ public class PartId implements Serializable {
     private String siteId;
     private String partId;
     private String partType;
+
 }

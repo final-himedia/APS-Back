@@ -9,7 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 
-@Entity
+@Entity(name = "ResourcePart")
 @Setter
 @Getter
 @Builder

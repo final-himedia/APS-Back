@@ -5,7 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 
-@Entity
+@Entity(name = "ExecutionOperationRouting")
 @Setter
 @Getter
 @Builder

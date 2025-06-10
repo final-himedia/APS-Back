@@ -9,13 +9,14 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 
-@Entity
+
 @Setter
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "part")
+@Entity(name = "ResultPart")
 public class Part {
 
     @EmbeddedId

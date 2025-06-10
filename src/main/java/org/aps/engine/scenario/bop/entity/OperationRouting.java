@@ -1,11 +1,14 @@
 package org.aps.engine.scenario.bop.entity;
 
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.aps.engine.execution.entity.Operation;
 import org.aps.engine.execution.entity.Routing;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -14,12 +17,14 @@ import org.aps.engine.execution.entity.Routing;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OperationRouting {
-    @Id
-    private Long id;
-    @ManyToOne
-    private Routing routing;
-    @ManyToOne
-    private Operation operation;
+    @EmbeddedId
+    private OperationRoutingId operationRoutingId;
 
-    private Integer sequence;
+    private String scenarioId;
+    private String operationName;
+    private String operationType;
+    private LocalDateTime createDatetime;
+    private String createBy;
+    private LocalDateTime updateDatetime;
+    private String updateBy;
 }

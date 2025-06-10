@@ -1,25 +1,27 @@
 package org.aps.engine.scenario.bop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
-import org.aps.engine.execution.entity.Operation;
-import org.aps.engine.execution.entity.Routing;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "operation_routing")
 public class OperationRouting {
-    @Id
-    private Long id;
-    @ManyToOne
-    private Routing routing;
-    @ManyToOne
-    private Operation operation;
 
-    private Integer sequence;
+    @EmbeddedId
+    private OperationRoutingId operationRoutingId;
+
+    private String scenarioId;
+    private String operationName;
+    private String operationType;
+    private LocalDateTime createDatetime;
+    private String createBy;
+    private LocalDateTime updateDatetime;
+    private String updateBy;
 }

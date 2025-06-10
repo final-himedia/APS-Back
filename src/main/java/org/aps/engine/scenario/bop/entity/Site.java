@@ -18,13 +18,4 @@ public class Site {
     private String siteId;
     private String scenarioId;
     private String siteName;
-    private String createDatetime;
-    private String createBy;
-    private String updateDatetime;
-    private String updateBy;
-    private String interfaceDate;
-    private String interfaceTime;
-    private String interfaceType;
-    private String interfaceText;
-
 }

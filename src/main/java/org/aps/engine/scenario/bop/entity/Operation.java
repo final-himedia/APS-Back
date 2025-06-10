@@ -17,6 +17,7 @@ public class Operation {
 
     @EmbeddedId
     private OperationId operationId;
+
     private String scenarioId;
     private String operationName;
     private String runTime;

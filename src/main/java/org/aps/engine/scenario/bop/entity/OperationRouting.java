@@ -5,8 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
-import org.aps.engine.execution.entity.Operation;
-import org.aps.engine.execution.entity.Routing;
+
 
 import java.time.LocalDateTime;
 

@@ -1,10 +1,10 @@
 package org.aps.engine.scenario.bop.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.aps.engine.execution.entity.Part;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity(name = "BopDemand")

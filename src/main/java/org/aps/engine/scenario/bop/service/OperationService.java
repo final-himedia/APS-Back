@@ -7,9 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aps.engine.scenario.bop.entity.Bom;
-import org.aps.engine.scenario.bop.entity.BomId;
-import org.aps.engine.scenario.bop.entity.Operation;
+import org.aps.engine.scenario.bop.entity.*;
 import org.aps.engine.scenario.bop.repository.BomRepository;
 import org.aps.engine.scenario.bop.repository.OperationRepository;
 import org.springframework.stereotype.Service;
@@ -30,38 +28,70 @@ public class OperationService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
+            OperationId operationId = OperationId.builder().
+                    siteId(row.getCell(0).getStringCellValue()).
+                    operationId(row.getCell(1).getStringCellValue()).
+                    build();
 
+            Operation operation = Operation.builder().
+                    operationId(operationId).
+                    operationName(row.getCell(2).getStringCellValue()).
+                    runTime(row.getCell(3).getStringCellValue()).
+                    yield(row.getCell(4).getStringCellValue()).
+                    waitTime(row.getCell(5).getStringCellValue()).
+                    transferTime(row.getCell(6).getStringCellValue()).
+                    runTimeUom(row.getCell(7).getStringCellValue()).
+                    operationSeq(row.getCell(8).getStringCellValue()).
+                    operationType(row.getCell(9).getStringCellValue()).
+                    waitTimeUom(row.getCell(10).getStringCellValue()).
+                    transferTimeUom(row.getCell(11).getStringCellValue()).
+                    build();
 
+            operationRepository.save(operation);
         }
     }
 
-    public void exportBomExcel(HttpServletResponse response) throws IOException {
+    public void exportOperationExcel(HttpServletResponse response) throws IOException {
+        List<Operation> operations = operationRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("BOM");
+        Sheet sheet = workbook.createSheet("OPERATION");
+
+        String[] headers = {
+                "site_id", "operation_id", "operation_name", "run_time",
+                "yield", "wait_time", "transfer_time", "run_time_uom",
+                "operation_seq", "operation_type", "wait_time_uom", "transfer_time_uom"
+        };
 
         Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("to_site_id");
-        header.createCell(1).setCellValue("to_part_id");
-        header.createCell(2).setCellValue("bom_category");
-        header.createCell(3).setCellValue("out_qty");
-        header.createCell(4).setCellValue("from_site_id");
-        header.createCell(5).setCellValue("from_part_id");
-        header.createCell(6).setCellValue("in_qty");
-        header.createCell(7).setCellValue("create_by");
-        header.createCell(8).setCellValue("to_part_name");
-        header.createCell(9).setCellValue("from_part_name");
-        header.createCell(10).setCellValue("bom_text");
-        header.createCell(11).setCellValue("zseq");
-        header.createCell(12).setCellValue("scenario_id");
-        header.createCell(13).setCellValue("bom_version");
-        header.createCell(14).setCellValue("from_part_level");
+        for (int i = 0; i < headers.length; i++) {
+            header.createCell(i).setCellValue(headers[i]);
+        }
 
+        int rowIdx = 1;
+        for (Operation operation : operations) {
+            Row row = sheet.createRow(rowIdx++);
+            OperationId id = operation.getOperationId();
+
+            row.createCell(0).setCellValue(id.getSiteId());
+            row.createCell(1).setCellValue(id.getOperationId());
+            row.createCell(2).setCellValue(operation.getOperationName());
+            row.createCell(3).setCellValue(operation.getRunTime());
+            row.createCell(4).setCellValue(operation.getYield());
+            row.createCell(5).setCellValue(operation.getWaitTime());
+            row.createCell(6).setCellValue(operation.getTransferTime());
+            row.createCell(7).setCellValue(operation.getRunTimeUom());
+            row.createCell(8).setCellValue(operation.getOperationSeq());
+            row.createCell(9).setCellValue(operation.getOperationType());
+            row.createCell(10).setCellValue(operation.getWaitTimeUom());
+            row.createCell(11).setCellValue(operation.getTransferTimeUom());
+        }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=bom_export.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=operation_export.xlsx");
 
         workbook.write(response.getOutputStream());
         workbook.close();
     }
+
 }

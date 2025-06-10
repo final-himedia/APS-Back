@@ -58,7 +58,7 @@ public class DemandService {
         List<Demand> demands = demandRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Demand");
+        Sheet sheet = workbook.createSheet("DEMAND");
 
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("demand_id");

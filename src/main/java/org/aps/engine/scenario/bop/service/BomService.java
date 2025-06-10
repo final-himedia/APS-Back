@@ -75,7 +75,6 @@ public class BomService {
         header.createCell(14).setCellValue("from_part_level");
         header.createCell(15).setCellValue("to_part_level");
 
-        // 내용
         int rowIdx = 1;
         for (Bom bom : boms) {
             Row row = sheet.createRow(rowIdx++);

@@ -33,6 +33,7 @@ public class BopController {
     private final OperationRoutingService operationRoutingService;
     private final PartService partService;
     private final SiteService siteService;
+    private final DemandRepository demandRepository;
 
 
     @GetMapping("/routing")
@@ -105,6 +106,19 @@ public class BopController {
         response.put("status", 200);
         response.put("operationRoutings", operationRoutings);
         response.put("total", operationRoutings.size());
+
+        return ResponseEntity.status(200).body(response);
+
+    }
+
+    @GetMapping("/demand")
+    public ResponseEntity<?> getAllDemand() {
+        List<Demand> demands = demandRepository.findAll();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("demands", demands);
+        response.put("total", demands.size());
 
         return ResponseEntity.status(200).body(response);
 

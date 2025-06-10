@@ -1,10 +1,13 @@
 package org.aps.engine.scenario.bop.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 
-@Entity
+@Entity(name = "BopPart")
 @Setter
 @Getter
 @Builder

@@ -1,19 +1,20 @@
 package org.aps.engine.scenario.bop.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Entity(name = "BopDemand")
 @Setter
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "demand")
 public class Demand {
-
     @EmbeddedId
     private DemandId demandId;
 

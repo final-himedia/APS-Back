@@ -7,15 +7,14 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Entity(name = "BopDemand")
 @Setter
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "demand")
 public class Demand {
-
     @EmbeddedId
     private DemandId demandId;
 

@@ -1,7 +1,9 @@
 package org.aps.management.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.aps.management.entity.Comment;
 import org.aps.management.entity.Qna;
+import org.aps.management.repository.CommentRepository;
 import org.aps.management.repository.QnaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +17,9 @@ import java.util.List;
 @RequestMapping("/api/management/qna")
 @RequiredArgsConstructor
 public class ManagementController {
-
     private final QnaRepository qnaRepository;
+    private final CommentRepository commentRepository;
+
 
     // 전체 게시글 조회
     @GetMapping
@@ -25,7 +28,7 @@ public class ManagementController {
         return ResponseEntity.ok(qnas);
     }
 
-    // 게시글 상세 조회 (deleted = false 조건 포함)
+    // 게시글 상세 조회
     @GetMapping("/{id}")
     public ResponseEntity<Qna> detailQna(@PathVariable Integer id) {
         Qna qna = qnaRepository.findByIdAndDeletedFalse(id)
@@ -71,6 +74,13 @@ public class ManagementController {
         qna.setDeleted(true);
         qnaRepository.save(qna);
 
+        // 해당 게시글에 달린 댓글 삭제
+        List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalse(id);
+        for (Comment comment : comments) {
+            comment.setDeleted(true);
+        }
+        commentRepository.saveAll(comments);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -85,4 +95,26 @@ public class ManagementController {
 
         return ResponseEntity.ok(results);
     }
+
+    // 댓글 등록
+    @PostMapping("/{qnaId}/comment")
+    public ResponseEntity<Comment> createComment(@PathVariable Integer qnaId,
+                                                 @RequestBody Comment request) {
+
+        Comment comment = Comment.builder()
+                .qnaId(qnaId)
+                .writerId(request.getWriterId())
+                .content(request.getContent())
+                .wroteAt(LocalDateTime.now())
+                .deleted(false)
+                .build();
+
+        Comment saved = commentRepository.save(comment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+    }
+
+    // 댓글 수정
+
+    // 댓글 삭제
 }

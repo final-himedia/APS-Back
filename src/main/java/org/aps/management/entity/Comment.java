@@ -23,5 +23,4 @@ public class Comment {
     private String content;
     private LocalDateTime wroteAt;
     private Boolean deleted = false;
-
 }

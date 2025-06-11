@@ -11,47 +11,78 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/management/qna")
 @RequiredArgsConstructor
 public class ManagementController {
+
     private final QnaRepository qnaRepository;
 
-    // 게시글 전체 목록 조회
+    // 전체 게시글 조회
     @GetMapping
-    public ResponseEntity<?> getAllQnas() {
+    public ResponseEntity<List<Qna>> AllQna() {
         List<Qna> qnas = qnaRepository.findByDeletedFalse();
-        return ResponseEntity.status(200).body(qnas);
+        return ResponseEntity.ok(qnas);
     }
 
-    // 특정 게시글 상세 조회
+    // 게시글 상세 조회 (deleted = false 조건 포함)
     @GetMapping("/{id}")
-    public ResponseEntity<?> getQnaDetail(@PathVariable Integer id) {
-        Qna qna = qnaRepository.findById(id).orElseThrow(() -> {
-            return new ResponseStatusException(HttpStatus.NOT_FOUND);
-        });
+    public ResponseEntity<Qna> detailQna(@PathVariable Integer id) {
+        Qna qna = qnaRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (Boolean.TRUE.equals(qna.getDeleted())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        return ResponseEntity.status(200).body(qna);
+        return ResponseEntity.ok(qna);
     }
 
-    // 게시글 등록
+    // 새 게시글 등록
     @PostMapping
-    public ResponseEntity<Qna> createQna(@RequestBody Qna qna) {
+    public ResponseEntity<Qna> createQna(@RequestBody Qna request) {
         Qna newQna = Qna.builder()
-                .writerId(qna.getWriterId())
-                .title(qna.getTitle())
-                .content(qna.getContent())
+                .writerId(request.getWriterId())
+                .title(request.getTitle())
+                .content(request.getContent())
                 .wroteAt(LocalDateTime.now())
                 .deleted(false)
                 .build();
 
-        Qna saved = qnaRepository.save(newQna);
+        Qna savedQna = qnaRepository.save(newQna);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedQna);
+    }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    // 게시글 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Qna> updateQna(@PathVariable Integer id, @RequestBody Qna request) {
+        Qna qna = qnaRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        qna.setTitle(request.getTitle());
+        qna.setContent(request.getContent());
+
+        Qna updatedQna = qnaRepository.save(qna);
+        return ResponseEntity.ok(updatedQna);
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteQna(@PathVariable Integer id) {
+        Qna qna = qnaRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        qna.setDeleted(true);
+        qnaRepository.save(qna);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 검색
+    @GetMapping("/search")
+    public ResponseEntity<List<Qna>> searchQna(@RequestParam String title) {
+        List<Qna> results = qnaRepository.findByTitleAndDeletedFalse(title);
+
+        if (results.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(results);
     }
 }

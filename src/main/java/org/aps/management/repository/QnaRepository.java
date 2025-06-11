@@ -4,6 +4,7 @@ import org.aps.management.entity.Qna;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QnaRepository extends JpaRepository<Qna, Integer> {
 
@@ -11,9 +12,9 @@ public interface QnaRepository extends JpaRepository<Qna, Integer> {
     List<Qna> findByDeletedFalse();
 
     // 제목 조회
-    List<Qna> findByTitle(String title);
+    List<Qna> findByTitleAndDeletedFalse(String title);
 
     // 작성자 글 조회
-    List<Qna> findByWriterId(Long writerId);
+    Optional<Qna> findByIdAndDeletedFalse(Integer id);
 
 }

@@ -110,6 +110,62 @@ public class BopController {
 
     }
 
+    @PostMapping("/bom-save")
+    public ResponseEntity<?> saveBom(@RequestBody List<Bom> boms) {
+        List<Bom> saved = bomRepository.saveAll(boms);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "저장 완료"
+        ));
+    }
+
+    @DeleteMapping("/bom-delete")
+    public ResponseEntity<?> deleteBom(@RequestBody List<BomId> ids) {
+        bomRepository.deleteAllById(ids);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "삭제 완료",
+                "deletedIds", ids
+        ));
+    }
+
+    @PostMapping("/operation-save")
+    public ResponseEntity<?> saveOperation(@RequestBody List<Operation> operations) {
+        List<Operation> saved = operationRepository.saveAll(operations);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "저장 완료"
+        ));
+    }
+
+    @DeleteMapping("/operation-delete")
+    public ResponseEntity<?> deleteOperation(@RequestBody List<OperationId> ids) {
+        operationRepository.deleteAllById(ids);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "삭제 완료",
+                "deletedIds", ids
+        ));
+    }
+
+    @PostMapping("/part-save")
+    public ResponseEntity<?> savePart(@RequestBody List<Part> parts) {
+        List<Part> saved = partRepository.saveAll(parts);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "저장 완료"
+        ));
+    }
+
+    @DeleteMapping("/part-delete")
+    public ResponseEntity<?> deletePart(@RequestBody List<PartId> ids) {
+        partRepository.deleteAllById(ids);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "삭제 완료",
+                "deletedIds", ids
+        ));
+    }
 
     @PostMapping("/bom-upload")
     public ResponseEntity<String> uploadBomExcel(@RequestParam("file") MultipartFile file) throws IOException {

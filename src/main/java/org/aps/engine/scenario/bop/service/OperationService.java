@@ -2,10 +2,7 @@ package org.aps.engine.scenario.bop.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.*;
 import org.aps.engine.scenario.bop.repository.BomRepository;
@@ -24,28 +21,29 @@ public class OperationService {
     public void excelHandle(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
+        DataFormatter formatter = new DataFormatter();
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            OperationId operationId = OperationId.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    operationId(row.getCell(1).getStringCellValue()).
-                    build();
+            OperationId operationId = OperationId.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .operationId(formatter.formatCellValue(row.getCell(1)))
+                    .build();
 
-            Operation operation = Operation.builder().
-                    operationId(operationId).
-                    operationName(row.getCell(2).getStringCellValue()).
-                    runTime(row.getCell(3).getStringCellValue()).
-                    yield(row.getCell(4).getStringCellValue()).
-                    waitTime(row.getCell(5).getStringCellValue()).
-                    transferTime(row.getCell(6).getStringCellValue()).
-                    runTimeUom(row.getCell(7).getStringCellValue()).
-                    operationSeq(row.getCell(8).getStringCellValue()).
-                    operationType(row.getCell(9).getStringCellValue()).
-                    waitTimeUom(row.getCell(10).getStringCellValue()).
-                    transferTimeUom(row.getCell(11).getStringCellValue()).
-                    build();
+            Operation operation = Operation.builder()
+                    .operationId(operationId)
+                    .operationName(formatter.formatCellValue(row.getCell(2)))
+                    .runTime(formatter.formatCellValue(row.getCell(3)))
+                    .yield(formatter.formatCellValue(row.getCell(4)))
+                    .waitTime(formatter.formatCellValue(row.getCell(5)))
+                    .transferTime(formatter.formatCellValue(row.getCell(6)))
+                    .runTimeUom(formatter.formatCellValue(row.getCell(7)))
+                    .operationSeq(formatter.formatCellValue(row.getCell(8)))
+                    .operationType(formatter.formatCellValue(row.getCell(9)))
+                    .waitTimeUom(formatter.formatCellValue(row.getCell(10)))
+                    .transferTimeUom(formatter.formatCellValue(row.getCell(11)))
+                    .build();
 
             operationRepository.save(operation);
         }

@@ -2,10 +2,7 @@ package org.aps.engine.scenario.config.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.Operation;
 import org.aps.engine.scenario.bop.entity.OperationId;
@@ -25,29 +22,31 @@ public class ConfigService {
     private final PriorityRepository priorityRepository;
 
     public void excelHandle(MultipartFile file) throws IOException {
+        DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            PriorityId priorityId = PriorityId.builder().
-                    priorityId(row.getCell(0).getStringCellValue()).
-                    factorId(row.getCell(1).getStringCellValue()).
-                    scenarioId(row.getCell(6).getStringCellValue()).
-                    build();
+            PriorityId priorityId = PriorityId.builder()
+                    .priorityId(formatter.formatCellValue(row.getCell(0)))
+                    .factorId(formatter.formatCellValue(row.getCell(1)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(6)))
+                    .build();
 
-            Priority priority = Priority.builder().
-                    priorityId(priorityId).
-                    factorType(row.getCell(2).getStringCellValue()).
-                    orderType(row.getCell(3).getStringCellValue()).
-                    sequence((int) row.getCell(4).getNumericCellValue()).
-                    description(row.getCell(5).getStringCellValue()).
-                    build();
+            Priority priority = Priority.builder()
+                    .priorityId(priorityId)
+                    .factorType(formatter.formatCellValue(row.getCell(2)))
+                    .orderType(formatter.formatCellValue(row.getCell(3)))
+                    .sequence(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
+                    .description(formatter.formatCellValue(row.getCell(5)))
+                    .build();
 
             priorityRepository.save(priority);
         }
     }
+
 
     public void exportPriorityExcel(HttpServletResponse response) throws IOException {
         List<Priority> priorities = priorityRepository.findAll();

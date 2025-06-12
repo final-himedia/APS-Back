@@ -2,10 +2,7 @@ package org.aps.engine.scenario.bop.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.Bom;
 import org.aps.engine.scenario.bop.entity.BomId;
@@ -24,18 +21,21 @@ public class SiteService {
     private final SiteRepository siteRepository;
 
     public void excelHandle(MultipartFile file) throws IOException {
+        DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
+            if (row == null) continue;
 
-            Site site = Site.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    siteName(row.getCell(1).getStringCellValue()).
-                    scenarioId(row.getCell(2).getStringCellValue()).
-                    build();
+            Site site = Site.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .siteName(formatter.formatCellValue(row.getCell(1)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(2)))
+                    .build();
 
+            siteRepository.save(site);
         }
     }
 

@@ -21,28 +21,30 @@ public class RoutingService {
     private final RoutingRepository routingRepository;
 
     public void routingExcelHandle(MultipartFile file) throws IOException {
-        DataFormatter dataFormatter = new DataFormatter();
-
+        DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
-            RoutingId routingId = RoutingId.builder().
-                    siteId(dataFormatter.formatCellValue(row.getCell(0))).
-                    routingId(dataFormatter.formatCellValue(row.getCell(1))).
-                    build();
+            if (row == null) continue;
 
-            Routing routing = Routing.builder().
-                    routingId(routingId).
-                    routingName(dataFormatter.formatCellValue(row.getCell(2))).
-                    routingType(dataFormatter.formatCellValue(row.getCell(3))).
-                    scenarioId(dataFormatter.formatCellValue(row.getCell(4))).
-                    build();
+            RoutingId routingId = RoutingId.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .routingId(formatter.formatCellValue(row.getCell(1)))
+                    .build();
+
+            Routing routing = Routing.builder()
+                    .routingId(routingId)
+                    .routingName(formatter.formatCellValue(row.getCell(2)))
+                    .routingType(formatter.formatCellValue(row.getCell(3)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(4)))
+                    .build();
 
             routingRepository.save(routing);
         }
     }
+
     public void exportRoutingExcel(HttpServletResponse response) throws IOException {
         List<Routing> routings = routingRepository.findAll();
 

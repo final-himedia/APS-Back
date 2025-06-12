@@ -59,7 +59,7 @@ public class AuthController {
 
 
 
-    @PostMapping("/login")
+    @PostMapping("/login")// 로그인 후 헤더에 토큰생성
     public ResponseEntity<?> loginHandle(@RequestBody @Valid LoginRequest login, BindingResult result){
         if (result.hasErrors()){
             return ResponseEntity.status(400).body("입력값 오류");
@@ -86,11 +86,10 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutHandle(){
-       ;
         return ResponseEntity.status(200).body("프론트에서 토큰 삭제");
     }
 
-    @PutMapping("/change-password")
+    @PutMapping("/change-password") // oldPass -> newPass 변경
     public ResponseEntity<?> changePasswordHandle(HttpServletRequest request, @RequestBody @Valid ChangePasswordRequest changePassword, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.status(400).body(null);
@@ -115,7 +114,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/find-password")
+    @PostMapping("/find-password")// user객체에서 등록된 메일로 임시 비밀번호 발송
     public ResponseEntity<?> findPasswordHandle(@RequestBody @Valid FindPasswordRequest passwordRequest, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.status(400).body("이메일 형식 오류");

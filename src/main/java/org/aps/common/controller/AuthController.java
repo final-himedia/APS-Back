@@ -85,9 +85,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutHandle(HttpSession session){
-        session.removeAttribute("user");
-        return ResponseEntity.status(200).body(null);
+    public ResponseEntity<?> logoutHandle(){
+       ;
+        return ResponseEntity.status(200).body("프론트에서 토큰 삭제");
     }
 
     @PutMapping("/change-password")

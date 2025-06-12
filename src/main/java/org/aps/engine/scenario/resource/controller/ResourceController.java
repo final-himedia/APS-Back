@@ -8,6 +8,7 @@ import org.aps.engine.scenario.resource.entity.WorkCenterMap;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
+import org.aps.engine.scenario.resource.service.ToolMapService;
 import org.aps.engine.scenario.resource.service.ToolMasterService;
 import org.aps.engine.scenario.resource.service.WorkCenterMapService;
 import org.aps.engine.scenario.resource.service.WorkCenterService;
@@ -35,6 +36,7 @@ public class ResourceController {
     private final ToolMasterService toolMasterService;
     private final WorkCenterService workCenterService;
     private final WorkCenterMapService workCenterMapService;
+    private final ToolMapService toolMapService;
 
     @GetMapping("/resource/tool-master")
     public ResponseEntity<?> getAllToolMaster() {
@@ -105,4 +107,16 @@ public class ResourceController {
     private void downloadWorkcenterMapExcel(HttpServletResponse response) throws IOException {
         workCenterMapService.exportWorkCenterMapExcel(response);
     }
+
+    @PostMapping("/toolmap-upload")
+    public ResponseEntity<String > uploadToolMapExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        toolMapService.excelHandle(file);
+        return ResponseEntity.ok("엑셀 업로드 완료");
+    }
+
+    @GetMapping("/toolmap-download")
+    private void downloadToolMapExcel(HttpServletResponse response) throws IOException {
+        toolMasterService.exportToolExcel(response);
+    }
+
 }

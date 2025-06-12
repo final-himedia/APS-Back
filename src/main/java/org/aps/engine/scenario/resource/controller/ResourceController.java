@@ -12,8 +12,10 @@ import org.aps.engine.scenario.resource.service.ToolMasterService;
 import org.aps.engine.scenario.resource.service.WorkCenterMapService;
 import org.aps.engine.scenario.resource.service.WorkCenterService;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/scenarios")
 @RequiredArgsConstructor

@@ -2,10 +2,7 @@ package org.aps.engine.scenario.bop.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.Bom;
 import org.aps.engine.scenario.bop.entity.BomId;
@@ -27,28 +24,31 @@ public class PartService {
     public void excelHandle(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
+        DataFormatter formatter = new DataFormatter();
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            PartId partId = PartId.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    partId(row.getCell(1).getStringCellValue()).
-                    partType(row.getCell(2).getStringCellValue()).
-                    build();
+            PartId partId = PartId.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .partId(formatter.formatCellValue(row.getCell(1)))
+                    .partType(formatter.formatCellValue(row.getCell(2)))
+                    .build();
 
-            Part part = Part.builder().
-                    partId(partId).
-                    routingId(row.getCell(3).getStringCellValue()).
-                    partName(row.getCell(4).getStringCellValue()).
-                    minBatchSize((int) row.getCell(5).getNumericCellValue()).
-                    maxBatchSize((int) row.getCell(6).getNumericCellValue()).
-                    uom(row.getCell(7).getStringCellValue()).
-                    scenarioId(row.getCell(8).getStringCellValue()).
-                    build();
+            Part part = Part.builder()
+                    .partId(partId)
+                    .routingId(formatter.formatCellValue(row.getCell(3)))
+                    .partName(formatter.formatCellValue(row.getCell(4)))
+                    .minBatchSize(Integer.parseInt(formatter.formatCellValue(row.getCell(5))))
+                    .maxBatchSize(Integer.parseInt(formatter.formatCellValue(row.getCell(6))))
+                    .uom(formatter.formatCellValue(row.getCell(7)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(8)))
+                    .build();
 
+            partRepository.save(part); // 누락된 저장 로직 추가
         }
     }
+
 
     public void exportPartExcel(HttpServletResponse response) throws IOException {
         List<Part> parts = partRepository.findAll();

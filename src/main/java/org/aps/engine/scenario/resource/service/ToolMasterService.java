@@ -2,10 +2,7 @@ package org.aps.engine.scenario.resource.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.Operation;
 import org.aps.engine.scenario.bop.entity.OperationId;
@@ -23,23 +20,26 @@ public class ToolMasterService {
     private final ToolMasterRepository toolMasterRepository;
 
     public void excelHandle(MultipartFile file) throws IOException {
+        DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            ToolMaster tool = ToolMaster.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    toolId(row.getCell(1).getStringCellValue()).
-                    toolState(row.getCell(2).getStringCellValue()).
-                    toolCavity((int) row.getCell(3).getNumericCellValue()).
-                    scenarioId(row.getCell(4).getStringCellValue()).
-                    toolName(row.getCell(5).getStringCellValue()).build();
+            ToolMaster tool = ToolMaster.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .toolId(formatter.formatCellValue(row.getCell(1)))
+                    .toolState(formatter.formatCellValue(row.getCell(2)))
+                    .toolCavity(Integer.parseInt(formatter.formatCellValue(row.getCell(3))))
+                    .scenarioId(formatter.formatCellValue(row.getCell(4)))
+                    .toolName(formatter.formatCellValue(row.getCell(5)))
+                    .build();
 
             toolMasterRepository.save(tool);
         }
     }
+
 
     public void exportToolExcel(HttpServletResponse response) throws IOException {
         List<ToolMaster> tools = toolMasterRepository.findAll();

@@ -21,35 +21,38 @@ public class BomService {
     public void excelHandle(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
-        DataFormatter dataFormatter = new DataFormatter();
+        DataFormatter formatter = new DataFormatter();
+
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
+
             BomId bomId = BomId.builder()
-                    .toSiteId(row.getCell(0).getStringCellValue())
-                    .toPartId(row.getCell(1).getStringCellValue())
-                    .fromSiteId(row.getCell(5).getStringCellValue())
-                    .fromPartId(row.getCell(6).getStringCellValue())
-                    .zseq(row.getCell(12).getStringCellValue())
+                    .toSiteId(formatter.formatCellValue(row.getCell(0)))
+                    .toPartId(formatter.formatCellValue(row.getCell(1)))
+                    .fromSiteId(formatter.formatCellValue(row.getCell(5)))
+                    .fromPartId(formatter.formatCellValue(row.getCell(6)))
+                    .zseq(formatter.formatCellValue(row.getCell(12)))
                     .build();
 
             Bom bom = Bom.builder()
                     .bomId(bomId)
-                    .bomCategory(row.getCell(3).getStringCellValue())
-                    .outQty(row.getCell(4).getStringCellValue())
-                    .inQty(row.getCell(7).getStringCellValue())
-                    .createBy(row.getCell(8).getStringCellValue())
-                    .toPartName(row.getCell(9).getStringCellValue())
-                    .fromPartName(row.getCell(10).getStringCellValue())
-                    .bomText(row.getCell(11).getStringCellValue())
-                    .scenarioId(row.getCell(13).getStringCellValue())
-                    .bomVersion(row.getCell(14).getStringCellValue())
-                    .fromPartLevel(row.getCell(15).getStringCellValue())
-                    .toPartLevel(row.getCell(16).getStringCellValue())
+                    .bomCategory(formatter.formatCellValue(row.getCell(3)))
+                    .outQty(formatter.formatCellValue(row.getCell(4)))
+                    .inQty(formatter.formatCellValue(row.getCell(7)))
+                    .createBy(formatter.formatCellValue(row.getCell(8)))
+                    .toPartName(formatter.formatCellValue(row.getCell(9)))
+                    .fromPartName(formatter.formatCellValue(row.getCell(10)))
+                    .bomText(formatter.formatCellValue(row.getCell(11)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(13)))
+                    .bomVersion(formatter.formatCellValue(row.getCell(14)))
+                    .fromPartLevel(formatter.formatCellValue(row.getCell(15)))
+                    .toPartLevel(formatter.formatCellValue(row.getCell(16)))
                     .build();
 
             bomRepository.save(bom);
         }
     }
+
 
     public void exportBomExcel(HttpServletResponse response) throws IOException {
         List<Bom> boms = bomRepository.findAll();

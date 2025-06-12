@@ -2,10 +2,7 @@ package org.aps.engine.scenario.resource.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.resource.entity.WorkCenter;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
@@ -21,6 +18,7 @@ public class WorkCenterService {
     private final WorkCenterRepository workCenterRepository;
 
     public void excelHandle(MultipartFile file) throws IOException {
+        DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
@@ -28,21 +26,22 @@ public class WorkCenterService {
             Row row = sheet.getRow(i);
 
             WorkCenter workCenter = WorkCenter.builder()
-                    .siteId(row.getCell(0).getStringCellValue())
-                    .workcenterId(row.getCell(1).getStringCellValue())
-                    .workcenterName(row.getCell(2).getStringCellValue())
-                    .workcenterGroup(row.getCell(3).getStringCellValue())
-                    .workcenterType(row.getCell(4).getStringCellValue())
-                    .priorityId(row.getCell(5).getStringCellValue())
-                    .dispatcherType(row.getCell(6).getStringCellValue())
-                    .workcenterState(row.getCell(7).getStringCellValue())
-                    .automation(row.getCell(8).getStringCellValue())
-                    .scenarioId(row.getCell(9).getStringCellValue())
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .workcenterId(formatter.formatCellValue(row.getCell(1)))
+                    .workcenterName(formatter.formatCellValue(row.getCell(2)))
+                    .workcenterGroup(formatter.formatCellValue(row.getCell(3)))
+                    .workcenterType(formatter.formatCellValue(row.getCell(4)))
+                    .priorityId(formatter.formatCellValue(row.getCell(5)))
+                    .dispatcherType(formatter.formatCellValue(row.getCell(6)))
+                    .workcenterState(formatter.formatCellValue(row.getCell(7)))
+                    .automation(formatter.formatCellValue(row.getCell(8)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(9)))
                     .build();
 
             workCenterRepository.save(workCenter);
         }
     }
+
 
     public void exportWorkCenterExcel(HttpServletResponse response) throws IOException {
         List<WorkCenter> workCenters = workCenterRepository.findAll();

@@ -2,10 +2,7 @@ package org.aps.engine.scenario.resource.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.Operation;
 import org.aps.engine.scenario.bop.entity.OperationId;
@@ -23,30 +20,32 @@ public class WorkCenterMapService {
     private final WorkCenterMapRepository workCenterMapRepository;
 
     public void excelHandle(MultipartFile file) throws IOException {
+        DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            WorkCenterMap workCenterMap = WorkCenterMap.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    routingGroup(row.getCell(1).getStringCellValue()).
-                    partId(row.getCell(2).getStringCellValue()).
-                    operationId(row.getCell(3).getStringCellValue()).
-                    routingGroup(row.getCell(4).getStringCellValue()).
-                    routingVersion(row.getCell(5).getStringCellValue()).
-                    workcenterId(row.getCell(6).getStringCellValue()).
-                    tactTime(row.getCell(7).getStringCellValue()).
-                    tactTimeUom(row.getCell(8).getStringCellValue()).
-                    procTime(row.getCell(9).getStringCellValue()).
-                    procTimeUom(row.getCell(10).getStringCellValue()).
-                    scenarioId(row.getCell(11).getStringCellValue()).
-                    build();
+            WorkCenterMap workCenterMap = WorkCenterMap.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .routingGroup(formatter.formatCellValue(row.getCell(1)))
+                    .partId(formatter.formatCellValue(row.getCell(2)))
+                    .operationId(formatter.formatCellValue(row.getCell(3)))
+                    .routingGroup(formatter.formatCellValue(row.getCell(4)))  // routingGroup이 두번인데 맞나요?
+                    .routingVersion(formatter.formatCellValue(row.getCell(5)))
+                    .workcenterId(formatter.formatCellValue(row.getCell(6)))
+                    .tactTime(formatter.formatCellValue(row.getCell(7)))
+                    .tactTimeUom(formatter.formatCellValue(row.getCell(8)))
+                    .procTime(formatter.formatCellValue(row.getCell(9)))
+                    .procTimeUom(formatter.formatCellValue(row.getCell(10)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(11)))
+                    .build();
 
             workCenterMapRepository.save(workCenterMap);
         }
     }
+
 
     public void exportWorkCenterMapExcel(HttpServletResponse response) throws IOException {
         List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findAll();

@@ -2,10 +2,7 @@ package org.aps.engine.scenario.bop.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.OperationRouting;
 import org.aps.engine.scenario.bop.entity.OperationRoutingId;
@@ -25,28 +22,29 @@ public class OperationRoutingService {
     public void excelHandle(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
+        DataFormatter formatter = new DataFormatter();
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            OperationRoutingId operationRoutingId = OperationRoutingId.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    routingId(row.getCell(1).getStringCellValue()).
-                    operationId(row.getCell(2).getStringCellValue()).
-                    operationSeq((int) row.getCell(4).getNumericCellValue()).
-                    build();
+            OperationRoutingId operationRoutingId = OperationRoutingId.builder()
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .routingId(formatter.formatCellValue(row.getCell(1)))
+                    .operationId(formatter.formatCellValue(row.getCell(2)))
+                    .operationSeq(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
+                    .build();
 
-            OperationRouting operationRouting = OperationRouting.builder().
-                    operationRoutingId(operationRoutingId).
-                    operationName(row.getCell(3).getStringCellValue()).
-                    operationType(row.getCell(5).getStringCellValue()).
-                    scenarioId(row.getCell(6).getStringCellValue()).
-                    build();
-
+            OperationRouting operationRouting = OperationRouting.builder()
+                    .operationRoutingId(operationRoutingId)
+                    .operationName(formatter.formatCellValue(row.getCell(3)))
+                    .operationType(formatter.formatCellValue(row.getCell(5)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(6)))
+                    .build();
 
             operationRoutingRepository.save(operationRouting);
         }
     }
+
     public void exportOperationRoutingExcel(HttpServletResponse response) throws IOException {
         List<OperationRouting> operationRoutings = operationRoutingRepository.findAll();
 

@@ -2,10 +2,7 @@ package org.aps.engine.scenario.bop.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.Bom;
 import org.aps.engine.scenario.bop.entity.BomId;
@@ -24,21 +21,23 @@ public class RoutingService {
     private final RoutingRepository routingRepository;
 
     public void routingExcelHandle(MultipartFile file) throws IOException {
+        DataFormatter dataFormatter = new DataFormatter();
+
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             RoutingId routingId = RoutingId.builder().
-                    siteId(row.getCell(0).getStringCellValue()).
-                    routingId(row.getCell(1).getStringCellValue()).
+                    siteId(dataFormatter.formatCellValue(row.getCell(0))).
+                    routingId(dataFormatter.formatCellValue(row.getCell(1))).
                     build();
 
             Routing routing = Routing.builder().
                     routingId(routingId).
-                    routingName(row.getCell(2).getStringCellValue()).
-                    routingType(row.getCell(3).getStringCellValue()).
-                    scenarioId(row.getCell(4).getStringCellValue()).
+                    routingName(dataFormatter.formatCellValue(row.getCell(2))).
+                    routingType(dataFormatter.formatCellValue(row.getCell(3))).
+                    scenarioId(dataFormatter.formatCellValue(row.getCell(4))).
                     build();
 
             routingRepository.save(routing);

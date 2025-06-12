@@ -2,9 +2,11 @@ package org.aps.engine.scenario.resource.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.aps.engine.scenario.resource.entity.ToolMap;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
 import org.aps.engine.scenario.resource.entity.WorkCenter;
 import org.aps.engine.scenario.resource.entity.WorkCenterMap;
+import org.aps.engine.scenario.resource.repository.ToolMapRepository;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
@@ -22,7 +24,6 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 @CrossOrigin
 @RestController
@@ -37,6 +38,7 @@ public class ResourceController {
     private final WorkCenterService workCenterService;
     private final WorkCenterMapService workCenterMapService;
     private final ToolMapService toolMapService;
+    private final ToolMapRepository toolMapRepository;
 
     @GetMapping("/resource/tool-master")
     public ResponseEntity<?> getAllToolMaster() {
@@ -47,6 +49,18 @@ public class ResourceController {
         response.put("status", 200);
         response.put("toolMasters", toolMasters);
         response.put("total", toolMasters.size());
+
+        return ResponseEntity.status(200).body(response);
+    }
+    @GetMapping("/resource/tool-map")
+    public ResponseEntity<?> getAllToolMap() {
+        List<ToolMap> toolMaps = toolMapRepository.findAll();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("status", 200);
+        response.put("toolMasters", toolMaps);
+        response.put("total", toolMaps.size());
 
         return ResponseEntity.status(200).body(response);
     }

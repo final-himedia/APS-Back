@@ -1,5 +1,8 @@
 package org.aps.common.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +11,10 @@ import org.aps.common.repository.UserRepository;
 import org.aps.common.request.ChangePasswordRequest;
 import org.aps.common.request.FindPasswordRequest;
 import org.aps.common.request.LoginRequest;
+import org.aps.common.response.LoginResult;
 import org.aps.common.service.MailService;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -23,6 +28,9 @@ import java.util.UUID;
 public class AuthController {
     private final UserRepository userRepository;
     private final MailService mailService;
+
+    @Value("${jwt.secret}")
+    private String secret;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signupHandle(@RequestBody @Valid User user, BindingResult result){
@@ -49,8 +57,10 @@ public class AuthController {
         return ResponseEntity.status(200).body(users);
     }
 
+
+
     @PostMapping("/login")
-    public ResponseEntity<?> loginHandle(@RequestBody @Valid LoginRequest login, BindingResult result, HttpSession session){
+    public ResponseEntity<?> loginHandle(@RequestBody @Valid LoginRequest login, BindingResult result){
         if (result.hasErrors()){
             return ResponseEntity.status(400).body("입력값 오류");
         }
@@ -61,8 +71,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("잘못된 비밀번호");
         }
 
-        session.setAttribute("user", user);
-        return ResponseEntity.status(200).body(user);
+        String token = JWT.create()
+                .withIssuer("aps")
+                .withSubject(user.getEmail())
+                .sign(Algorithm.HMAC256(secret));
+
+        LoginResult loginResult = LoginResult.builder()
+                .token(token)
+                .user(user)
+                .build();
+
+        return ResponseEntity.status(200).body(loginResult);
     }
 
     @PostMapping("/logout")
@@ -72,11 +91,12 @@ public class AuthController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePasswordHandle(@SessionAttribute("user") User user, @RequestBody @Valid ChangePasswordRequest changePassword, BindingResult result) {
+    public ResponseEntity<?> changePasswordHandle(HttpServletRequest request, @RequestBody @Valid ChangePasswordRequest changePassword, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.status(400).body(null);
         }
 
+        User user = (User) request.getAttribute("user");
         if (!changePassword.getEmail().equals(user.getEmail())) {
             return ResponseEntity.status(403).body(null);
         }

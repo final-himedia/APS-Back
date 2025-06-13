@@ -12,6 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoutingId implements Serializable {
+    private String scenarioId;
     private String siteId;
     private String routingId;
 }

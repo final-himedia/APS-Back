@@ -11,8 +11,9 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkCenterId implements Serializable {
-    private String siteId;
-    private String workcenterId;
+public class ToolMapId implements Serializable {
+    private String partId;
     private String scenarioId;
+    private String toolId;
+
 }

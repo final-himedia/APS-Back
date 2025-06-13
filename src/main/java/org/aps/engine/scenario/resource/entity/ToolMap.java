@@ -11,12 +11,11 @@ import lombok.*;
 @NoArgsConstructor
 @Table(name = "tool_map")
 public class ToolMap {
-    @Id
+
+    @EmbeddedId
+    private ToolMapId toolMapId;
     private String siteId;
     private String toolSize;
-    private String scenarioId;
-    private String partId;
-    private String toolId;
     private String partName;
 
 }

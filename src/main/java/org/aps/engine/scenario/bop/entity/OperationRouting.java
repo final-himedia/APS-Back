@@ -16,10 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OperationRouting {
+
     @EmbeddedId
     private OperationRoutingId operationRoutingId;
-
-    private String scenarioId;
     private String operationName;
     private String operationType;
     private LocalDateTime createDatetime;

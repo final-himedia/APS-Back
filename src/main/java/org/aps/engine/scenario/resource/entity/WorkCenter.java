@@ -1,5 +1,6 @@
 package org.aps.engine.scenario.resource.entity;
 
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,9 +15,9 @@ import lombok.*;
 @Table(name = "workcenter")
 public class WorkCenter {
 
-    @Id
-    private String workcenterId;
-    private String siteId;
+    @EmbeddedId
+    private WorkCenterId workcenterId;
+
     private String workcenterName;
     private String workcenterGroup;
     private String workcenterType;
@@ -24,5 +25,5 @@ public class WorkCenter {
     private String dispatcherType;
     private String workcenterState;
     private String automation;
-    private String scenarioId;
+
 }

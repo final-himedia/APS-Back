@@ -4,6 +4,6 @@ import org.aps.engine.scenario.resource.entity.ToolMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("resourceToolMapRepository")
 public interface ToolMapRepository extends JpaRepository<ToolMap, String> {
 }

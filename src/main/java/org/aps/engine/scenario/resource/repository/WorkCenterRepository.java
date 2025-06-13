@@ -4,7 +4,7 @@ import org.aps.engine.scenario.resource.entity.WorkCenter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("resourceWorkCenterRepository")
 public interface WorkCenterRepository extends JpaRepository<WorkCenter, String> {
 
 }

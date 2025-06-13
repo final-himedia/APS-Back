@@ -5,7 +5,7 @@ import org.aps.engine.scenario.config.entity.PriorityId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("configPriorityRepository")
 public interface PriorityRepository extends JpaRepository<Priority, PriorityId> {
 }
 

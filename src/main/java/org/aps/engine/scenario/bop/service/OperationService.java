@@ -43,6 +43,8 @@ public class OperationService {
                     .operationType(formatter.formatCellValue(row.getCell(9)))
                     .waitTimeUom(formatter.formatCellValue(row.getCell(10)))
                     .transferTimeUom(formatter.formatCellValue(row.getCell(11)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(12)))
+                    .sourcingType(formatter.formatCellValue(row.getCell(13)))
                     .build();
 
             operationRepository.save(operation);

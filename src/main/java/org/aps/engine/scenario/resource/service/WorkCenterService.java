@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.resource.entity.WorkCenter;
+import org.aps.engine.scenario.resource.entity.WorkCenterId;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,9 +26,14 @@ public class WorkCenterService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            WorkCenter workCenter = WorkCenter.builder()
-                    .siteId(formatter.formatCellValue(row.getCell(0)))
-                    .workcenterId(formatter.formatCellValue(row.getCell(1)))
+            WorkCenterId workCenterId = WorkCenterId.builder().
+                    siteId(formatter.formatCellValue(row.getCell(0))).
+                    workcenterId(formatter.formatCellValue(row.getCell(1))).
+                    scenarioId(formatter.formatCellValue(row.getCell(9))).
+                    build();
+
+            WorkCenter workCenter = WorkCenter.builder().
+                    workcenterId(workCenterId)
                     .workcenterName(formatter.formatCellValue(row.getCell(2)))
                     .workcenterGroup(formatter.formatCellValue(row.getCell(3)))
                     .workcenterType(formatter.formatCellValue(row.getCell(4)))
@@ -35,7 +41,6 @@ public class WorkCenterService {
                     .dispatcherType(formatter.formatCellValue(row.getCell(6)))
                     .workcenterState(formatter.formatCellValue(row.getCell(7)))
                     .automation(formatter.formatCellValue(row.getCell(8)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(9)))
                     .build();
 
             workCenterRepository.save(workCenter);
@@ -64,8 +69,10 @@ public class WorkCenterService {
         for (WorkCenter workCenter : workCenters) {
             Row row = sheet.createRow(rowIdx++);
 
-            row.createCell(0).setCellValue(workCenter.getSiteId());
-            row.createCell(1).setCellValue(workCenter.getWorkcenterId());
+            WorkCenterId id = workCenter.getWorkcenterId();
+
+            row.createCell(0).setCellValue(id.getSiteId());
+            row.createCell(1).setCellValue(id.getWorkcenterId());
             row.createCell(2).setCellValue(workCenter.getWorkcenterName());
             row.createCell(3).setCellValue(workCenter.getWorkcenterGroup());
             row.createCell(4).setCellValue(workCenter.getWorkcenterType());
@@ -73,7 +80,7 @@ public class WorkCenterService {
             row.createCell(6).setCellValue(workCenter.getDispatcherType());
             row.createCell(7).setCellValue(workCenter.getWorkcenterState());
             row.createCell(8).setCellValue(workCenter.getAutomation());
-            row.createCell(9).setCellValue(workCenter.getScenarioId());
+            row.createCell(9).setCellValue(id.getScenarioId());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -82,4 +89,5 @@ public class WorkCenterService {
         workbook.write(response.getOutputStream());
         workbook.close();
     }
+
 }

@@ -33,6 +33,7 @@ public class PartService {
                     .siteId(formatter.formatCellValue(row.getCell(0)))
                     .partId(formatter.formatCellValue(row.getCell(1)))
                     .partType(formatter.formatCellValue(row.getCell(2)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(8)))
                     .build();
 
             Part part = Part.builder()
@@ -42,7 +43,6 @@ public class PartService {
                     .minBatchSize(Integer.parseInt(formatter.formatCellValue(row.getCell(5))))
                     .maxBatchSize(Integer.parseInt(formatter.formatCellValue(row.getCell(6))))
                     .uom(formatter.formatCellValue(row.getCell(7)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(8)))
                     .build();
 
             partRepository.save(part); // 누락된 저장 로직 추가
@@ -80,15 +80,15 @@ public class PartService {
             row.createCell(5).setCellValue(part.getMinBatchSize());
             row.createCell(6).setCellValue(part.getMaxBatchSize());
             row.createCell(7).setCellValue(part.getUom());
-            row.createCell(8).setCellValue(part.getScenarioId());
+            row.createCell(8).setCellValue(id.getScenarioId());
+
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=part_export.xlsx");
+
+            workbook.write(response.getOutputStream());
+            workbook.close();
         }
 
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=part_export.xlsx");
 
-        workbook.write(response.getOutputStream());
-        workbook.close();
     }
-
-
 }

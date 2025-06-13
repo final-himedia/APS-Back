@@ -22,7 +22,6 @@ public class WorkCenterMap {
     @Embedded
     private WorkCenterId workcenterId;
     private String tactTime;
-    @Column(name = "tack_time_uom")
     private String tactTimeUom;
     private String procTime;
     private String procTimeUom;

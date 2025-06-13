@@ -71,7 +71,7 @@ public class RoutingService {
 
         // 응답 설정
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=bom_export.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=routing_export.xlsx");
 
         workbook.write(response.getOutputStream());
         workbook.close();

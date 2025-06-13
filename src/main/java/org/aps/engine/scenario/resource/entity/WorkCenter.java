@@ -16,8 +16,7 @@ import lombok.*;
 public class WorkCenter {
 
     @EmbeddedId
-    private WorkCenterId workcenterId;
-
+    private WorkCenterId workCenterId;
     private String workcenterName;
     private String workcenterGroup;
     private String workcenterType;
@@ -25,5 +24,4 @@ public class WorkCenter {
     private String dispatcherType;
     private String workcenterState;
     private String automation;
-
 }

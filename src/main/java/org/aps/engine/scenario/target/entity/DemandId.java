@@ -15,4 +15,6 @@ public class DemandId implements Serializable {
     private String demandId;
     private String siteId;
     private String partId;
+    private String scenarioId;
+
 }

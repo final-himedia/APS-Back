@@ -1,5 +1,6 @@
 package org.aps.engine.scenario.resource.entity;
 
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -13,11 +14,10 @@ import lombok.*;
 @NoArgsConstructor
 @Table(name = "tool_master")
 public class ToolMaster {
-    @Id
-    private String toolId;
-    private String siteId;
+
+    @EmbeddedId
+    private ToolMasterId toolMasterId;
     private String toolState;
     private Integer toolCavity;
-    private String scenarioId;
     private String toolName;
 }

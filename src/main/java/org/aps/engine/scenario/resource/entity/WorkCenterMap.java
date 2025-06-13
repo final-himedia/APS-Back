@@ -1,6 +1,9 @@
 package org.aps.engine.scenario.resource.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
@@ -12,18 +15,15 @@ import lombok.*;
 @Table(name = "workcenter_map")
 public class WorkCenterMap {
 
-    @Id
+    @EmbeddedId
+    private WorkCenterMapId workCenterMapId;
     private String routingId;
-
+    private String siteId;
     private String partId;
-    private String operationId;
     private String routingGroup;
     private String routingVersion;
-    @Embedded
-    private WorkCenterId workcenterId;
     private String tactTime;
     private String tactTimeUom;
     private String procTime;
     private String procTimeUom;
-
 }

@@ -13,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OperationId implements Serializable {
+    private String scenarioId;
     private String siteId;
     private String operationId;
 }

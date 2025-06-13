@@ -15,10 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "demand")
 public class Demand {
+
     @EmbeddedId
     private DemandId demandId;
-
-    private String scenarioId;
     private String partName;
     private String customerId;
     private LocalDateTime dueDate;

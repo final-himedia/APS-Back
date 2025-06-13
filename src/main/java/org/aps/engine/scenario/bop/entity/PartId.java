@@ -13,8 +13,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PartId implements Serializable {
+    private String scenarioId;
     private String siteId;
     private String partId;
     private String partType;
-    private String scenarioId;
 }

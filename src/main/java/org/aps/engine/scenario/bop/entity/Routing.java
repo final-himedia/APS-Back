@@ -17,7 +17,6 @@ public class Routing {
     @EmbeddedId
     private RoutingId routingId;
     private String description;
-    private String scenarioId;
     private String routingName;
     private String routingType;
 }

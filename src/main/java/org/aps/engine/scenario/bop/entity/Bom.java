@@ -16,7 +16,6 @@ public class Bom {
 
     @EmbeddedId
     private BomId bomId;
-    private  String scenarioId;
     private  String bomCategory;
     private  String fromPartName;
     private  String operationId;

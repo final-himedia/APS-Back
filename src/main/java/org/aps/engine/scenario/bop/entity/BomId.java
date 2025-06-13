@@ -12,6 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BomId implements Serializable {
+    private  String scenarioId;
     private  String fromSiteId;
     private  String fromPartId;
     private  String toSiteId;

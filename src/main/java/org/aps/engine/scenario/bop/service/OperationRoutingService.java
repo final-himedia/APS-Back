@@ -32,13 +32,13 @@ public class OperationRoutingService {
                     .routingId(formatter.formatCellValue(row.getCell(1)))
                     .operationId(formatter.formatCellValue(row.getCell(2)))
                     .operationSeq(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
+                    .scenarioId(formatter.formatCellValue(row.getCell(6)))
                     .build();
 
             OperationRouting operationRouting = OperationRouting.builder()
                     .operationRoutingId(operationRoutingId)
                     .operationName(formatter.formatCellValue(row.getCell(3)))
                     .operationType(formatter.formatCellValue(row.getCell(5)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(6)))
                     .build();
 
             operationRoutingRepository.save(operationRouting);
@@ -72,7 +72,7 @@ public class OperationRoutingService {
             row.createCell(3).setCellValue(operationRouting.getOperationName());
             row.createCell(4).setCellValue(id.getOperationSeq());
             row.createCell(5).setCellValue(operationRouting.getOperationType());
-            row.createCell(6).setCellValue(operationRouting.getScenarioId());
+            row.createCell(6).setCellValue(id.getScenarioId());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

@@ -32,6 +32,7 @@ public class DemandService {
                     demandId(row.getCell(0).getStringCellValue()).
                     siteId(row.getCell(1).getStringCellValue()).
                     partId(row.getCell(2).getStringCellValue()).
+                    scenarioId(row.getCell(14).getStringCellValue()).
                     build();
 
             Demand demand = Demand.builder().
@@ -47,7 +48,7 @@ public class DemandService {
                     exceptYn(row.getCell(11).getStringCellValue()).
                     headerCreationDate(row.getCell(12).getLocalDateTimeCellValue()).
                     hasOverActQty(row.getCell(13).getBooleanCellValue()).
-                    scenarioId(row.getCell(14).getStringCellValue()).
+
                     build();
 
             demandRepository.save(demand);
@@ -95,7 +96,7 @@ public class DemandService {
             row.createCell(11).setCellValue(demand.getExceptYn());
             row.createCell(12).setCellValue(demand.getHeaderCreationDate().toString());
             row.createCell(13).setCellValue(demand.getHasOverActQty().toString());
-            row.createCell(14).setCellValue(demand.getScenarioId());
+            row.createCell(14).setCellValue(id.getScenarioId());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

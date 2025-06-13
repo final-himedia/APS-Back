@@ -15,7 +15,6 @@ public class WorkCenterMap {
     @Id
     private String routingId;
 
-    private String siteId;
     private String partId;
     private String operationId;
     private String routingGroup;
@@ -26,6 +25,5 @@ public class WorkCenterMap {
     private String tactTimeUom;
     private String procTime;
     private String procTimeUom;
-    private String scenarioId;
 
 }

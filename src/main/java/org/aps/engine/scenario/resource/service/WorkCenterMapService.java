@@ -45,7 +45,6 @@ public class WorkCenterMapService {
                     .tactTimeUom(formatter.formatCellValue(row.getCell(8)))
                     .procTime(formatter.formatCellValue(row.getCell(9)))
                     .procTimeUom(formatter.formatCellValue(row.getCell(10)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(11)))
                     .build();
 
             workCenterMapRepository.save(workCenterMap);
@@ -74,22 +73,20 @@ public class WorkCenterMapService {
         for (WorkCenterMap map : workCenterMaps) {
             Row row = sheet.createRow(rowIdx++);
 
-            row.createCell(0).setCellValue(map.getSiteId());
-            row.createCell(1).setCellValue(map.getRoutingGroup());
-            row.createCell(2).setCellValue(map.getPartId());
-            row.createCell(3).setCellValue(map.getOperationId());
-            row.createCell(4).setCellValue(map.getRoutingVersion());
+            row.createCell(0).setCellValue(map.getRoutingGroup());
+            row.createCell(1).setCellValue(map.getPartId());
+            row.createCell(2).setCellValue(map.getOperationId());
+            row.createCell(3).setCellValue(map.getRoutingVersion());
 
             WorkCenterId wcId = map.getWorkcenterId();
-            row.createCell(5).setCellValue(wcId != null ? wcId.getSiteId() : "");
-            row.createCell(6).setCellValue(wcId != null ? wcId.getWorkcenterId() : "");
-            row.createCell(7).setCellValue(wcId != null ? wcId.getScenarioId() : "");
+            row.createCell(4).setCellValue(wcId != null ? wcId.getSiteId() : "");
+            row.createCell(5).setCellValue(wcId != null ? wcId.getWorkcenterId() : "");
+            row.createCell(6).setCellValue(wcId != null ? wcId.getScenarioId() : "");
 
-            row.createCell(8).setCellValue(map.getTactTime());
-            row.createCell(9).setCellValue(map.getTactTimeUom());
-            row.createCell(10).setCellValue(map.getProcTime());
-            row.createCell(11).setCellValue(map.getProcTimeUom());
-            row.createCell(12).setCellValue(map.getScenarioId());
+            row.createCell(7).setCellValue(map.getTactTime());
+            row.createCell(8).setCellValue(map.getTactTimeUom());
+            row.createCell(9).setCellValue(map.getProcTime());
+            row.createCell(10).setCellValue(map.getProcTimeUom());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

@@ -130,7 +130,7 @@ public class ResourceController {
 
     @GetMapping("/toolmap-download")
     private void downloadToolMapExcel(HttpServletResponse response) throws IOException {
-        toolMasterService.exportToolExcel(response);
+        toolMapService.exportToolMapExcel(response);
     }
 
 }

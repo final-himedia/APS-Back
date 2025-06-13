@@ -41,7 +41,7 @@ public class ToolMapService {
     }
 
 
-    public void exportToolExcel(HttpServletResponse response) throws IOException {
+    public void exportToolMapExcel(HttpServletResponse response) throws IOException {
         List<ToolMap> tools = toolMapRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();

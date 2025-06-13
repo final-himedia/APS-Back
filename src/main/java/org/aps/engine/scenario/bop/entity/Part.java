@@ -18,7 +18,6 @@ public class Part {
 
     @EmbeddedId
     private PartId partId;
-    private String scenarioId;
     private String routingId;
     private String partName;
     private Integer minBatchSize;

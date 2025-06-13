@@ -33,7 +33,7 @@ public class WorkCenterService {
                     build();
 
             WorkCenter workCenter = WorkCenter.builder().
-                    workcenterId(workCenterId)
+                    workCenterId(workCenterId)
                     .workcenterName(formatter.formatCellValue(row.getCell(2)))
                     .workcenterGroup(formatter.formatCellValue(row.getCell(3)))
                     .workcenterType(formatter.formatCellValue(row.getCell(4)))
@@ -69,7 +69,7 @@ public class WorkCenterService {
         for (WorkCenter workCenter : workCenters) {
             Row row = sheet.createRow(rowIdx++);
 
-            WorkCenterId id = workCenter.getWorkcenterId();
+            WorkCenterId id = workCenter.getWorkCenterId();
 
             row.createCell(0).setCellValue(id.getSiteId());
             row.createCell(1).setCellValue(id.getWorkcenterId());

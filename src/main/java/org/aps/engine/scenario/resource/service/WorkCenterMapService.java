@@ -8,6 +8,7 @@ import org.aps.engine.scenario.bop.entity.Operation;
 import org.aps.engine.scenario.bop.entity.OperationId;
 import org.aps.engine.scenario.resource.entity.WorkCenterId;
 import org.aps.engine.scenario.resource.entity.WorkCenterMap;
+import org.aps.engine.scenario.resource.entity.WorkCenterMapId;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,23 +29,22 @@ public class WorkCenterMapService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            WorkCenterId workCenterId = WorkCenterId.builder().
-                    siteId(formatter.formatCellValue(row.getCell(0))).
-                    workcenterId(formatter.formatCellValue(row.getCell(6))).
-                    scenarioId(formatter.formatCellValue(row.getCell(11))).
+            WorkCenterMapId workCenterMapId = WorkCenterMapId.builder().
+                    operationId(formatter.formatCellValue(row.getCell(3))).
+                    workCenterId(formatter.formatCellValue(row.getCell(6))).
+                    scenarioId(formatter.formatCellValue(row.getCell(10))).
                     build();
 
             WorkCenterMap workCenterMap = WorkCenterMap.builder()
-                    .workcenterId(workCenterId)
+                    .workCenterMapId(workCenterMapId)
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
                     .routingGroup(formatter.formatCellValue(row.getCell(1)))
                     .partId(formatter.formatCellValue(row.getCell(2)))
-                    .operationId(formatter.formatCellValue(row.getCell(3)))
-                    .routingGroup(formatter.formatCellValue(row.getCell(4)))  // routingGroup이 두번인데 맞나요?
-                    .routingVersion(formatter.formatCellValue(row.getCell(5)))
-                    .tactTime(formatter.formatCellValue(row.getCell(7)))
-                    .tactTimeUom(formatter.formatCellValue(row.getCell(8)))
-                    .procTime(formatter.formatCellValue(row.getCell(9)))
-                    .procTimeUom(formatter.formatCellValue(row.getCell(10)))
+                    .routingVersion(formatter.formatCellValue(row.getCell(4)))
+                    .tactTime(formatter.formatCellValue(row.getCell(6)))
+                    .tactTimeUom(formatter.formatCellValue(row.getCell(7)))
+                    .procTime(formatter.formatCellValue(row.getCell(8)))
+                    .procTimeUom(formatter.formatCellValue(row.getCell(9)))
                     .build();
 
             workCenterMapRepository.save(workCenterMap);
@@ -75,12 +75,12 @@ public class WorkCenterMapService {
 
             row.createCell(0).setCellValue(map.getRoutingGroup());
             row.createCell(1).setCellValue(map.getPartId());
-            row.createCell(2).setCellValue(map.getOperationId());
-            row.createCell(3).setCellValue(map.getRoutingVersion());
+            row.createCell(2).setCellValue(map.getRoutingVersion());
+            row.createCell(3).setCellValue(map.getSiteId());
 
-            WorkCenterId wcId = map.getWorkcenterId();
-            row.createCell(4).setCellValue(wcId != null ? wcId.getSiteId() : "");
-            row.createCell(5).setCellValue(wcId != null ? wcId.getWorkcenterId() : "");
+            WorkCenterMapId wcId = map.getWorkCenterMapId();
+            row.createCell(4).setCellValue(wcId != null ? wcId.getOperationId() : "");
+            row.createCell(5).setCellValue(wcId != null ? wcId.getWorkCenterId() : "");
             row.createCell(6).setCellValue(wcId != null ? wcId.getScenarioId() : "");
 
             row.createCell(7).setCellValue(map.getTactTime());

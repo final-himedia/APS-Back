@@ -4,7 +4,7 @@ import org.aps.engine.scenario.resource.entity.ToolMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("resourceToolMasterRepository")
 public interface ToolMasterRepository extends JpaRepository<ToolMaster, String> {
 
 }

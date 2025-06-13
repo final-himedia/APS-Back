@@ -29,6 +29,7 @@ public class OperationService {
             OperationId operationId = OperationId.builder()
                     .siteId(formatter.formatCellValue(row.getCell(0)))
                     .operationId(formatter.formatCellValue(row.getCell(1)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(12)))
                     .build();
 
             Operation operation = Operation.builder()
@@ -43,7 +44,6 @@ public class OperationService {
                     .operationType(formatter.formatCellValue(row.getCell(9)))
                     .waitTimeUom(formatter.formatCellValue(row.getCell(10)))
                     .transferTimeUom(formatter.formatCellValue(row.getCell(11)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(12)))
                     .sourcingType(formatter.formatCellValue(row.getCell(13)))
                     .build();
 
@@ -85,6 +85,7 @@ public class OperationService {
             row.createCell(9).setCellValue(operation.getOperationType());
             row.createCell(10).setCellValue(operation.getWaitTimeUom());
             row.createCell(11).setCellValue(operation.getTransferTimeUom());
+            row.createCell(12).setCellValue(id.getScenarioId());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

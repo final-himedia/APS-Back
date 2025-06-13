@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.resource.entity.ToolMap;
+import org.aps.engine.scenario.resource.entity.ToolMapId;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
 import org.aps.engine.scenario.resource.repository.ToolMapRepository;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
@@ -27,12 +28,15 @@ public class ToolMapService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
+            ToolMapId toolMapId = ToolMapId.builder()
+                    .scenarioId(formatter.formatCellValue(row.getCell(2)))
+                    .partId(formatter.formatCellValue(row.getCell(3)))
+                    .toolId(formatter.formatCellValue(row.getCell(4))).
+                    build();
+
             ToolMap tool = ToolMap.builder()
                     .siteId(formatter.formatCellValue(row.getCell(0)))
                     .toolSize(formatter.formatCellValue(row.getCell(1)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(2)))
-                    .partId(formatter.formatCellValue(row.getCell(3)))
-                    .toolId(formatter.formatCellValue(row.getCell(4)))
                     .partName(formatter.formatCellValue(row.getCell(5)))
                     .build();
 
@@ -63,9 +67,9 @@ public class ToolMapService {
             Row row = sheet.createRow(rowIdx++);
             row.createCell(0).setCellValue(tool.getSiteId());
             row.createCell(1).setCellValue(tool.getToolSize());
-            row.createCell(2).setCellValue(tool.getScenarioId());
-            row.createCell(3).setCellValue(tool.getPartId());
-            row.createCell(4).setCellValue(tool.getToolId());
+            row.createCell(2).setCellValue(tool.getToolMapId().getScenarioId());
+            row.createCell(3).setCellValue(tool.getToolMapId().getPartId());
+            row.createCell(4).setCellValue(tool.getToolMapId().getToolId());
             row.createCell(5).setCellValue(tool.getPartName());
         }
 

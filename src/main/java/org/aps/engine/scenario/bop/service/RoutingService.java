@@ -32,13 +32,13 @@ public class RoutingService {
             RoutingId routingId = RoutingId.builder()
                     .siteId(formatter.formatCellValue(row.getCell(0)))
                     .routingId(formatter.formatCellValue(row.getCell(1)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(4)))
                     .build();
 
             Routing routing = Routing.builder()
                     .routingId(routingId)
                     .routingName(formatter.formatCellValue(row.getCell(2)))
                     .routingType(formatter.formatCellValue(row.getCell(3)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(4)))
                     .build();
 
             routingRepository.save(routing);
@@ -65,7 +65,7 @@ public class RoutingService {
             row.createCell(1).setCellValue(routing.getRoutingId().getRoutingId());
             row.createCell(2).setCellValue(routing.getRoutingName());
             row.createCell(3).setCellValue(routing.getRoutingType());
-            row.createCell(4).setCellValue(routing.getScenarioId());
+            row.createCell(4).setCellValue(routing.getRoutingId().getScenarioId());
 
         }
 

@@ -29,24 +29,29 @@ public class BomService {
             BomId bomId = BomId.builder()
                     .toSiteId(formatter.formatCellValue(row.getCell(0)))
                     .toPartId(formatter.formatCellValue(row.getCell(1)))
-                    .fromSiteId(formatter.formatCellValue(row.getCell(5)))
-                    .fromPartId(formatter.formatCellValue(row.getCell(6)))
-                    .zseq(formatter.formatCellValue(row.getCell(12)))
+                    .fromSiteId(formatter.formatCellValue(row.getCell(6)))
+                    .fromPartId(formatter.formatCellValue(row.getCell(7)))
+                    .zseq(formatter.formatCellValue(row.getCell(16)))
+                    .scenarioId(formatter.formatCellValue(row.getCell(17)))
                     .build();
 
             Bom bom = Bom.builder()
                     .bomId(bomId)
+                    .operationId(formatter.formatCellValue(row.getCell(2)))
                     .bomCategory(formatter.formatCellValue(row.getCell(3)))
                     .outQty(formatter.formatCellValue(row.getCell(4)))
-                    .inQty(formatter.formatCellValue(row.getCell(7)))
-                    .createBy(formatter.formatCellValue(row.getCell(8)))
-                    .toPartName(formatter.formatCellValue(row.getCell(9)))
-                    .fromPartName(formatter.formatCellValue(row.getCell(10)))
-                    .bomText(formatter.formatCellValue(row.getCell(11)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(13)))
-                    .bomVersion(formatter.formatCellValue(row.getCell(14)))
-                    .fromPartLevel(formatter.formatCellValue(row.getCell(15)))
-                    .toPartLevel(formatter.formatCellValue(row.getCell(16)))
+                    .outUom(formatter.formatCellValue(row.getCell(5)))
+                    .inQty(formatter.formatCellValue(row.getCell(8)))
+                    .inUom(formatter.formatCellValue(row.getCell(9)))
+                    .createDatetime(formatter.formatCellValue(row.getCell(10)))
+                    .effStartDate(formatter.formatCellValue(row.getCell(11)))
+                    .createBy(formatter.formatCellValue(row.getCell(12)))
+                    .toPartName(formatter.formatCellValue(row.getCell(13)))
+                    .fromPartName(formatter.formatCellValue(row.getCell(14)))
+                    .bomText(formatter.formatCellValue(row.getCell(15)))
+                    .bomVersion(formatter.formatCellValue(row.getCell(18)))
+                    .fromPartLevel(formatter.formatCellValue(row.getCell(19)))
+                    .toPartLevel(formatter.formatCellValue(row.getCell(20)))
                     .build();
 
             bomRepository.save(bom);
@@ -56,47 +61,47 @@ public class BomService {
 
     public void exportBomExcel(HttpServletResponse response) throws IOException {
         List<Bom> boms = bomRepository.findAll();
-
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("BOM");
 
+        // 21개 컬럼 헤더
+        String[] headers = {
+                "to_site_id", "to_part_id", "operation_id", "bom_category", "out_qty", "out_uom",
+                "from_site_id", "from_part_id", "in_qty", "in_uom",
+                "create_datetime", "eff_start_date", "create_by",
+                "to_part_name", "from_part_name", "bom_text", "zseq", "scenario_id",
+                "bom_version", "from_part_level", "to_part_level"
+        };
+
         Row header = sheet.createRow(0);
-        header.createCell(0).setCellValue("to_site_id");
-        header.createCell(1).setCellValue("to_part_id");
-        header.createCell(2).setCellValue("bom_category");
-        header.createCell(3).setCellValue("out_qty");
-        header.createCell(4).setCellValue("from_site_id");
-        header.createCell(5).setCellValue("from_part_id");
-        header.createCell(6).setCellValue("in_qty");
-        header.createCell(7).setCellValue("create_by");
-        header.createCell(8).setCellValue("to_part_name");
-        header.createCell(9).setCellValue("from_part_name");
-        header.createCell(10).setCellValue("bom_text");
-        header.createCell(11).setCellValue("zseq");
-        header.createCell(12).setCellValue("scenario_id");
-        header.createCell(13).setCellValue("bom_version");
-        header.createCell(14).setCellValue("from_part_level");
-        header.createCell(15).setCellValue("to_part_level");
+        for (int i = 0; i < headers.length; i++) {
+            header.createCell(i).setCellValue(headers[i]);
+        }
 
         int rowIdx = 1;
         for (Bom bom : boms) {
             Row row = sheet.createRow(rowIdx++);
             row.createCell(0).setCellValue(bom.getBomId().getToSiteId());
             row.createCell(1).setCellValue(bom.getBomId().getToPartId());
-            row.createCell(2).setCellValue(bom.getBomCategory());
-            row.createCell(3).setCellValue(bom.getOutQty());
-            row.createCell(4).setCellValue(bom.getBomId().getFromSiteId());
-            row.createCell(5).setCellValue(bom.getBomId().getFromPartId());
-            row.createCell(6).setCellValue(bom.getInQty());
-            row.createCell(7).setCellValue(bom.getCreateBy());
-            row.createCell(8).setCellValue(bom.getToPartName());
-            row.createCell(9).setCellValue(bom.getFromPartName());
-            row.createCell(10).setCellValue(bom.getBomText());
-            row.createCell(11).setCellValue(bom.getBomId().getZseq());
-            row.createCell(12).setCellValue(bom.getScenarioId());
-            row.createCell(13).setCellValue(bom.getBomVersion());
-            row.createCell(14).setCellValue(bom.getFromPartLevel());
-            row.createCell(15).setCellValue(bom.getToPartLevel());
+            row.createCell(2).setCellValue(bom.getOperationId());
+            row.createCell(3).setCellValue(bom.getBomCategory());
+            row.createCell(4).setCellValue(bom.getOutQty());
+            row.createCell(5).setCellValue(bom.getOutUom());
+            row.createCell(6).setCellValue(bom.getBomId().getFromSiteId());
+            row.createCell(7).setCellValue(bom.getBomId().getFromPartId());
+            row.createCell(8).setCellValue(bom.getInQty());
+            row.createCell(9).setCellValue(bom.getInUom());
+            row.createCell(10).setCellValue(bom.getCreateDatetime());
+            row.createCell(11).setCellValue(bom.getEffStartDate());
+            row.createCell(12).setCellValue(bom.getCreateBy());
+            row.createCell(13).setCellValue(bom.getToPartName());
+            row.createCell(14).setCellValue(bom.getFromPartName());
+            row.createCell(15).setCellValue(bom.getBomText());
+            row.createCell(16).setCellValue(bom.getBomId().getZseq());
+            row.createCell(17).setCellValue(bom.getBomId().getScenarioId());
+            row.createCell(18).setCellValue(bom.getBomVersion());
+            row.createCell(19).setCellValue(bom.getFromPartLevel());
+            row.createCell(20).setCellValue(bom.getToPartLevel());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -105,6 +110,4 @@ public class BomService {
         workbook.write(response.getOutputStream());
         workbook.close();
     }
-
-
 }

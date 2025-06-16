@@ -14,5 +14,5 @@ import java.io.Serializable;
 public class WorkCenterMapId implements Serializable {
     private String operationId;
     private String scenarioId;
-    private String workCenterId;
+    private String workcenterId;
 }

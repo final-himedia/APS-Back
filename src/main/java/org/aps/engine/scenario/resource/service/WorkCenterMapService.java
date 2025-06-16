@@ -31,7 +31,7 @@ public class WorkCenterMapService {
 
             WorkCenterMapId workCenterMapId = WorkCenterMapId.builder().
                     operationId(formatter.formatCellValue(row.getCell(3))).
-                    workCenterId(formatter.formatCellValue(row.getCell(6))).
+                    workcenterId(formatter.formatCellValue(row.getCell(6))).
                     scenarioId(formatter.formatCellValue(row.getCell(10))).
                     build();
 
@@ -80,7 +80,7 @@ public class WorkCenterMapService {
 
             WorkCenterMapId wcId = map.getWorkCenterMapId();
             row.createCell(4).setCellValue(wcId != null ? wcId.getOperationId() : "");
-            row.createCell(5).setCellValue(wcId != null ? wcId.getWorkCenterId() : "");
+            row.createCell(5).setCellValue(wcId != null ? wcId.getWorkcenterId() : "");
             row.createCell(6).setCellValue(wcId != null ? wcId.getScenarioId() : "");
 
             row.createCell(7).setCellValue(map.getTactTime());

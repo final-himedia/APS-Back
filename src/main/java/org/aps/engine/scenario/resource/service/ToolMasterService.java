@@ -29,18 +29,35 @@ public class ToolMasterService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
+            String siteId = formatter.formatCellValue(row.getCell(0));
+            siteId = (siteId == null) ? "" : siteId;
+
+            String toolId = formatter.formatCellValue(row.getCell(1));
+            toolId = (toolId == null) ? "" : toolId;
+
+            String scenarioId = formatter.formatCellValue(row.getCell(4));
+            scenarioId = (scenarioId == null) ? "" : scenarioId;
+
             ToolMasterId toolMasterId = ToolMasterId.builder()
-                    .siteId(formatter.formatCellValue(row.getCell(0)))
-                    .toolId(formatter.formatCellValue(row.getCell(1)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(4)))
+                    .siteId(siteId)
+                    .toolId(toolId)
+                    .scenarioId(scenarioId)
                     .build();
 
+            String cavityStr = formatter.formatCellValue(row.getCell(3));
+            int cavity = (cavityStr == null || cavityStr.trim().isEmpty()) ? 0 : Integer.parseInt(cavityStr);
+
+            String toolState = formatter.formatCellValue(row.getCell(2));
+            toolState = (toolState == null) ? "" : toolState;
+
+            String toolName = formatter.formatCellValue(row.getCell(5));
+            toolName = (toolName == null) ? "" : toolName;
+
             ToolMaster tool = ToolMaster.builder()
-
-
-                    .toolState(formatter.formatCellValue(row.getCell(2)))
-                    .toolCavity(Integer.parseInt(formatter.formatCellValue(row.getCell(3))))
-                    .toolName(formatter.formatCellValue(row.getCell(5)))
+                    .toolMasterId(toolMasterId)
+                    .toolState(toolState)
+                    .toolCavity(cavity)
+                    .toolName(toolName)
                     .build();
 
             toolMasterRepository.save(tool);
@@ -71,12 +88,24 @@ public class ToolMasterService {
 
             ToolMasterId toolMasterId = tool.getToolMasterId();
 
-            row.createCell(0).setCellValue(toolMasterId.getSiteId());
-            row.createCell(1).setCellValue(toolMasterId.getToolId());
-            row.createCell(2).setCellValue(tool.getToolState());
-            row.createCell(3).setCellValue(tool.getToolCavity());
-            row.createCell(4).setCellValue(toolMasterId.getScenarioId());
-            row.createCell(5).setCellValue(tool.getToolName());
+            // 문자열 null 처리
+            String siteId = (toolMasterId.getSiteId() == null) ? "" : toolMasterId.getSiteId();
+            String toolId = (toolMasterId.getToolId() == null) ? "" : toolMasterId.getToolId();
+            String scenarioId = (toolMasterId.getScenarioId() == null) ? "" : toolMasterId.getScenarioId();
+
+            String toolState = (tool.getToolState() == null) ? "" : tool.getToolState();
+            String toolName = (tool.getToolName() == null) ? "" : tool.getToolName();
+
+            // 숫자형 null 처리 (만약 Integer 타입이라면)
+            Integer cavity = tool.getToolCavity();
+            int toolCavity = (cavity == null) ? 0 : cavity;
+
+            row.createCell(0).setCellValue(siteId);
+            row.createCell(1).setCellValue(toolId);
+            row.createCell(2).setCellValue(toolState);
+            row.createCell(3).setCellValue(toolCavity);
+            row.createCell(4).setCellValue(scenarioId);
+            row.createCell(5).setCellValue(toolName);
         }
 
         // HTTP 응답 설정
@@ -86,6 +115,4 @@ public class ToolMasterService {
         workbook.write(response.getOutputStream());
         workbook.close();
     }
-
-
 }

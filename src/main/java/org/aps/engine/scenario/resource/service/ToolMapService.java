@@ -29,21 +29,21 @@ public class ToolMapService {
             Row row = sheet.getRow(i);
 
             ToolMapId toolMapId = ToolMapId.builder()
-                    .scenarioId(formatter.formatCellValue(row.getCell(2)))
-                    .partId(formatter.formatCellValue(row.getCell(3)))
-                    .toolId(formatter.formatCellValue(row.getCell(4))).
-                    build();
+                    .scenarioId(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .partId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
+                    .toolId(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .build();
 
             ToolMap tool = ToolMap.builder()
-                    .siteId(formatter.formatCellValue(row.getCell(0)))
-                    .toolSize(formatter.formatCellValue(row.getCell(1)))
-                    .partName(formatter.formatCellValue(row.getCell(5)))
+                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+                    .toolSize(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
+                    .partName(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .toolMapId(toolMapId)
                     .build();
 
             toolMapRepository.save(tool);
         }
     }
-
 
     public void exportToolMapExcel(HttpServletResponse response) throws IOException {
         List<ToolMap> tools = toolMapRepository.findAll();
@@ -65,12 +65,23 @@ public class ToolMapService {
         int rowIdx = 1;
         for (ToolMap tool : tools) {
             Row row = sheet.createRow(rowIdx++);
-            row.createCell(0).setCellValue(tool.getSiteId());
-            row.createCell(1).setCellValue(tool.getToolSize());
-            row.createCell(2).setCellValue(tool.getToolMapId().getScenarioId());
-            row.createCell(3).setCellValue(tool.getToolMapId().getPartId());
-            row.createCell(4).setCellValue(tool.getToolMapId().getToolId());
-            row.createCell(5).setCellValue(tool.getPartName());
+
+            String siteId = tool.getSiteId() == null ? "" : tool.getSiteId();
+            String toolSize = tool.getToolSize() == null ? "" : tool.getToolSize();
+
+            ToolMapId toolMapId = tool.getToolMapId();
+            String scenarioId = (toolMapId == null || toolMapId.getScenarioId() == null) ? "" : toolMapId.getScenarioId();
+            String partId = (toolMapId == null || toolMapId.getPartId() == null) ? "" : toolMapId.getPartId();
+            String toolId = (toolMapId == null || toolMapId.getToolId() == null) ? "" : toolMapId.getToolId();
+
+            String partName = tool.getPartName() == null ? "" : tool.getPartName();
+
+            row.createCell(0).setCellValue(siteId);
+            row.createCell(1).setCellValue(toolSize);
+            row.createCell(2).setCellValue(scenarioId);
+            row.createCell(3).setCellValue(partId);
+            row.createCell(4).setCellValue(toolId);
+            row.createCell(5).setCellValue(partName);
         }
 
         // 응답 헤더 설정

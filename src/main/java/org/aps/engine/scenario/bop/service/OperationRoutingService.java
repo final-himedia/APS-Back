@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.bop.entity.OperationRouting;
 import org.aps.engine.scenario.bop.entity.OperationRoutingId;
-
 import org.aps.engine.scenario.bop.repository.OperationRoutingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,23 +25,40 @@ public class OperationRoutingService {
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
+            if (row == null) continue;
+
+            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
+            String routingId = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
+            String operationId = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
+            String operationSeqStr = row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4));
+            int operationSeq = 0;
+            try {
+                operationSeq = operationSeqStr.isEmpty() ? 0 : Integer.parseInt(operationSeqStr);
+            } catch (NumberFormatException e) {
+                operationSeq = 0;
+            }
+            String scenarioId = row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6));
 
             OperationRoutingId operationRoutingId = OperationRoutingId.builder()
-                    .siteId(formatter.formatCellValue(row.getCell(0)))
-                    .routingId(formatter.formatCellValue(row.getCell(1)))
-                    .operationId(formatter.formatCellValue(row.getCell(2)))
-                    .operationSeq(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
-                    .scenarioId(formatter.formatCellValue(row.getCell(6)))
+                    .siteId(siteId)
+                    .routingId(routingId)
+                    .operationId(operationId)
+                    .operationSeq(operationSeq)
+                    .scenarioId(scenarioId)
                     .build();
+
+            String operationName = row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3));
+            String operationType = row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5));
 
             OperationRouting operationRouting = OperationRouting.builder()
                     .operationRoutingId(operationRoutingId)
-                    .operationName(formatter.formatCellValue(row.getCell(3)))
-                    .operationType(formatter.formatCellValue(row.getCell(5)))
+                    .operationName(operationName)
+                    .operationType(operationType)
                     .build();
 
             operationRoutingRepository.save(operationRouting);
         }
+        workbook.close();
     }
 
     public void exportOperationRoutingExcel(HttpServletResponse response) throws IOException {
@@ -66,13 +82,13 @@ public class OperationRoutingService {
             Row row = sheet.createRow(rowIdx++);
             OperationRoutingId id = operationRouting.getOperationRoutingId();
 
-            row.createCell(0).setCellValue(id.getSiteId());
-            row.createCell(1).setCellValue(id.getRoutingId());
-            row.createCell(2).setCellValue(id.getOperationId());
-            row.createCell(3).setCellValue(operationRouting.getOperationName());
-            row.createCell(4).setCellValue(id.getOperationSeq());
-            row.createCell(5).setCellValue(operationRouting.getOperationType());
-            row.createCell(6).setCellValue(id.getScenarioId());
+            row.createCell(0).setCellValue(id.getSiteId() == null ? "" : id.getSiteId());
+            row.createCell(1).setCellValue(id.getRoutingId() == null ? "" : id.getRoutingId());
+            row.createCell(2).setCellValue(id.getOperationId() == null ? "" : id.getOperationId());
+            row.createCell(3).setCellValue(operationRouting.getOperationName() == null ? "" : operationRouting.getOperationName());
+            row.createCell(4).setCellValue(id.getOperationSeq()); // int 기본형이라 null 체크 불필요
+            row.createCell(5).setCellValue(operationRouting.getOperationType() == null ? "" : operationRouting.getOperationType());
+            row.createCell(6).setCellValue(id.getScenarioId() == null ? "" : id.getScenarioId());
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -81,5 +97,4 @@ public class OperationRoutingService {
         workbook.write(response.getOutputStream());
         workbook.close();
     }
-
 }

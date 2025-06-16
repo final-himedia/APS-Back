@@ -25,28 +25,28 @@ public class WorkCenterService {
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
+            if (row == null) continue;
 
-            WorkCenterId workCenterId = WorkCenterId.builder().
-                    siteId(formatter.formatCellValue(row.getCell(0))).
-                    workcenterId(formatter.formatCellValue(row.getCell(1))).
-                    scenarioId(formatter.formatCellValue(row.getCell(9))).
-                    build();
+            WorkCenterId workCenterId = WorkCenterId.builder()
+                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+                    .workcenterId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
+                    .scenarioId(row.getCell(9) == null ? "" : formatter.formatCellValue(row.getCell(9)))
+                    .build();
 
-            WorkCenter workCenter = WorkCenter.builder().
-                    workCenterId(workCenterId)
-                    .workcenterName(formatter.formatCellValue(row.getCell(2)))
-                    .workcenterGroup(formatter.formatCellValue(row.getCell(3)))
-                    .workcenterType(formatter.formatCellValue(row.getCell(4)))
-                    .priorityId(formatter.formatCellValue(row.getCell(5)))
-                    .dispatcherType(formatter.formatCellValue(row.getCell(6)))
-                    .workcenterState(formatter.formatCellValue(row.getCell(7)))
-                    .automation(formatter.formatCellValue(row.getCell(8)))
+            WorkCenter workCenter = WorkCenter.builder()
+                    .workCenterId(workCenterId)
+                    .workcenterName(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .workcenterGroup(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
+                    .workcenterType(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .priorityId(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .dispatcherType(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
+                    .workcenterState(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
+                    .automation(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
                     .build();
 
             workCenterRepository.save(workCenter);
         }
     }
-
 
     public void exportWorkCenterExcel(HttpServletResponse response) throws IOException {
         List<WorkCenter> workCenters = workCenterRepository.findAll();
@@ -71,16 +71,16 @@ public class WorkCenterService {
 
             WorkCenterId id = workCenter.getWorkCenterId();
 
-            row.createCell(0).setCellValue(id.getSiteId());
-            row.createCell(1).setCellValue(id.getWorkcenterId());
-            row.createCell(2).setCellValue(workCenter.getWorkcenterName());
-            row.createCell(3).setCellValue(workCenter.getWorkcenterGroup());
-            row.createCell(4).setCellValue(workCenter.getWorkcenterType());
-            row.createCell(5).setCellValue(workCenter.getPriorityId());
-            row.createCell(6).setCellValue(workCenter.getDispatcherType());
-            row.createCell(7).setCellValue(workCenter.getWorkcenterState());
-            row.createCell(8).setCellValue(workCenter.getAutomation());
-            row.createCell(9).setCellValue(id.getScenarioId());
+            row.createCell(0).setCellValue(id != null && id.getSiteId() != null ? id.getSiteId() : "");
+            row.createCell(1).setCellValue(id != null && id.getWorkcenterId() != null ? id.getWorkcenterId() : "");
+            row.createCell(2).setCellValue(workCenter.getWorkcenterName() != null ? workCenter.getWorkcenterName() : "");
+            row.createCell(3).setCellValue(workCenter.getWorkcenterGroup() != null ? workCenter.getWorkcenterGroup() : "");
+            row.createCell(4).setCellValue(workCenter.getWorkcenterType() != null ? workCenter.getWorkcenterType() : "");
+            row.createCell(5).setCellValue(workCenter.getPriorityId() != null ? workCenter.getPriorityId() : "");
+            row.createCell(6).setCellValue(workCenter.getDispatcherType() != null ? workCenter.getDispatcherType() : "");
+            row.createCell(7).setCellValue(workCenter.getWorkcenterState() != null ? workCenter.getWorkcenterState() : "");
+            row.createCell(8).setCellValue(workCenter.getAutomation() != null ? workCenter.getAutomation() : "");
+            row.createCell(9).setCellValue(id != null && id.getScenarioId() != null ? id.getScenarioId() : "");
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -89,5 +89,4 @@ public class WorkCenterService {
         workbook.write(response.getOutputStream());
         workbook.close();
     }
-
 }

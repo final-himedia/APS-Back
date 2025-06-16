@@ -2,6 +2,8 @@ package org.aps.engine.scenario.target.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.aps.engine.scenario.bop.entity.Routing;
+import org.aps.engine.scenario.config.entity.Priority;
 import org.aps.engine.scenario.target.service.DemandService;
 import org.aps.engine.scenario.target.entity.Demand;
 import org.aps.engine.scenario.target.repository.DemandRepository;
@@ -19,14 +21,12 @@ import java.util.Map;
 @RequestMapping("/api/scenarios/target")
 @RequiredArgsConstructor
 public class TargetController {
-
     private final DemandRepository demandRepository;
     private final DemandService demandService;
-    @GetMapping("/demand")
-    public ResponseEntity<?> getAllDemand() {
 
-        List<Demand> demands = demandRepository.findAll();
-
+    @GetMapping("/demand/{scenarioId}")
+    public ResponseEntity<?> getAllDemand(@PathVariable String scenarioId) {
+        List<Demand> demands = demandRepository.findByDemandIdScenarioId(scenarioId);
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
         response.put("demands", demands);

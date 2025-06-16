@@ -2,6 +2,7 @@ package org.aps.engine.scenario.config.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.aps.engine.scenario.bop.entity.Part;
 import org.aps.engine.scenario.bop.entity.Routing;
 import org.aps.engine.scenario.config.entity.Priority;
 import org.aps.engine.scenario.config.repository.PriorityRepository;
@@ -24,10 +25,10 @@ public class ConfigController {
     private final PriorityRepository priorityRepository;
     private final ConfigService configService;
 
-    @GetMapping("/priority")
-    public ResponseEntity<?> getAllPriority() {
+    @GetMapping("/priority/{scenarioId}")
+    public ResponseEntity<?> getAllPriority(@PathVariable String scenarioId) {
 
-        List<Priority> prioritys = priorityRepository.findAll();
+        List<Priority> prioritys = priorityRepository.findByPriorityIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);

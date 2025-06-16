@@ -40,9 +40,9 @@ public class ResourceController {
     private final ToolMapService toolMapService;
     private final ToolMapRepository toolMapRepository;
 
-    @GetMapping("/resource/tool-master")
-    public ResponseEntity<?> getAllToolMaster() {
-        List<ToolMaster> toolMasters = toolMasterRepository.findAll();
+    @GetMapping("/resource/tool-master/{scenarioId}")
+    public ResponseEntity<?> getAllToolMaster(@PathVariable String scenarioId) {
+        List<ToolMaster> toolMasters = toolMasterRepository.findByToolMasterIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
 
@@ -52,8 +52,8 @@ public class ResourceController {
 
         return ResponseEntity.status(200).body(response);
     }
-    @GetMapping("/resource/tool-map")
-    public ResponseEntity<?> getAllToolMap() {
+    @GetMapping("/resource/tool-map/{scenarioId}")
+    public ResponseEntity<?> getAllToolMap(@PathVariable String scenarioId) {
         List<ToolMap> toolMaps = toolMapRepository.findAll();
 
         Map<String, Object> response = new LinkedHashMap<>();
@@ -65,8 +65,8 @@ public class ResourceController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/resource/workcenter")
-    public ResponseEntity<?> getAllWorkCenter() {
+    @GetMapping("/resource/workcenter/{scenarioId}")
+    public ResponseEntity<?> getAllWorkCenter(@PathVariable String scenarioId) {
         List<WorkCenter> workCenters = workCenterRepository.findAll();
 
         Map<String, Object> response = new LinkedHashMap<>();
@@ -78,8 +78,8 @@ public class ResourceController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/resource/workcentermap")
-    public ResponseEntity<?> getAllWorkCenterMap() {
+    @GetMapping("/resource/workcentermap/{scenarioId}")
+    public ResponseEntity<?> getAllWorkCenterMap(@PathVariable String scenarioId) {
         List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findAll();
 
         Map<String, Object> response = new LinkedHashMap<>();

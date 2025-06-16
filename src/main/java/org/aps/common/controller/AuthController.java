@@ -15,6 +15,7 @@ import org.aps.common.response.LoginResult;
 import org.aps.common.service.MailService;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -59,7 +60,7 @@ public class AuthController {
 
 
 
-    @PostMapping("/login")// 로그인 후 헤더에 토큰생성
+    @PostMapping("/login")
     public ResponseEntity<?> loginHandle(@RequestBody @Valid LoginRequest login, BindingResult result){
         if (result.hasErrors()){
             return ResponseEntity.status(400).body("입력값 오류");
@@ -76,12 +77,14 @@ public class AuthController {
                 .withSubject(user.getEmail())
                 .sign(Algorithm.HMAC256(secret));
 
-        LoginResult loginResult = LoginResult.builder()
-                .token(token)
-                .user(user)
-                .build();
 
-        return ResponseEntity.status(200).body(loginResult);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+
+
+        return ResponseEntity.status(200)
+                .headers(headers)
+                .body(user); // 또는 null, 혹은 원하는 객체
     }
 
     @PostMapping("/logout")
@@ -100,7 +103,7 @@ public class AuthController {
             return ResponseEntity.status(403).body(null);
         }
 
-        User found = userRepository.findByEmail(changePassword.getEmail());
+        User found = userRepository.findByEmail(user.getEmail());
 
         if (found == null || !BCrypt.checkpw(changePassword.getOldPassword(), found.getPassword())) {
             return ResponseEntity.status(401).body(null);

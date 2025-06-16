@@ -18,11 +18,11 @@ public class AppConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
                 // 인터셉터를 적용할 URL 패턴
                 .addPathPatterns(
-                        "/api/management/**"
+                        "/api/management/**", "/api/auth/change-password"
                 )
                 // 필요 없는 URL은 제외
                 .excludePathPatterns(
-                        "/api/auth/**"
+                       "/api/auth/login", "/api/auth/signup", "/api/auth/find-password"
                 );
     }
 }

@@ -19,7 +19,6 @@ import java.util.Map;
 @RequestMapping("/api/scenarios/bop")
 @RequiredArgsConstructor
 public class BopController {
-
     private final RoutingRepository routingRepository;
     private final OperationRepository operationRepository;
     private final PartRepository partRepository;
@@ -28,17 +27,16 @@ public class BopController {
     private final OperationRoutingRepository operationRoutingRepository;
     private final BomService bomService;
     private final RoutingService routingService;
-
     private final OperationService operationService;
     private final OperationRoutingService operationRoutingService;
     private final PartService partService;
     private final SiteService siteService;
 
 
-    @GetMapping("/routing")
-    public ResponseEntity<?> getAllRouting() {
-
-        List<Routing> routings = routingRepository.findAll();
+    // 시나리오 ID 별로 조회
+    @GetMapping("/routing/{scenarioId}")
+    public ResponseEntity<?> getAllRouting(@PathVariable String scenarioId) {
+        List<Routing> routings = routingRepository.findByRoutingIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -48,10 +46,9 @@ public class BopController {
         return ResponseEntity.status(200).body(response);
     }
 
-
-    @GetMapping("/operation")
-    public ResponseEntity<?> getAllOperation() {
-        List<Operation> operations = operationRepository.findAll();
+    @GetMapping("/operation/{scenarioId}")
+    public ResponseEntity<?> getAllOperation(@PathVariable String scenarioId) {
+        List<Operation> operations = operationRepository.findByOperationIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -61,9 +58,9 @@ public class BopController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/part")
-    public ResponseEntity<?> getAllPart() {
-        List<Part> parts = partRepository.findAll();
+    @GetMapping("/part/{scenarioId}")
+    public ResponseEntity<?> getAllPart(@PathVariable String scenarioId) {
+        List<Part> parts = partRepository.findByPartIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -73,9 +70,9 @@ public class BopController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/bom")
-    public ResponseEntity<?> getAllBom() {
-        List<Bom> boms = bomRepository.findAll();
+    @GetMapping("/bom/{scenarioId}")
+    public ResponseEntity<?> getAllBom(@PathVariable String scenarioId) {
+        List<Bom> boms = bomRepository.findByBomIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -85,9 +82,9 @@ public class BopController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/site")
-    public ResponseEntity<?> getAllSite() {
-        List<Site> sites = siteRepository.findAll();
+    @GetMapping("/site/{scenarioId}")
+    public ResponseEntity<?> getAllSite(@PathVariable String scenarioId) {
+        List<Site> sites = siteRepository.findByScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -97,9 +94,9 @@ public class BopController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/operationRouting")
-    public ResponseEntity<?> getAllOperationRouting() {
-        List<OperationRouting> operationRoutings = operationRoutingRepository.findAll();
+    @GetMapping("/operationRouting/{scenarioId}")
+    public ResponseEntity<?> getAllOperationRouting(@PathVariable String scenarioId) {
+        List<OperationRouting> operationRoutings = operationRoutingRepository.findByOperationRoutingIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -107,7 +104,6 @@ public class BopController {
         response.put("total", operationRoutings.size());
 
         return ResponseEntity.status(200).body(response);
-
     }
 
     @PostMapping("/bom-save")

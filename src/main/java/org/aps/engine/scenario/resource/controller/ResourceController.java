@@ -27,7 +27,7 @@ import java.util.Map;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/scenarios")
+@RequestMapping("/api/scenarios/resource")
 @RequiredArgsConstructor
 public class ResourceController {
 
@@ -40,7 +40,7 @@ public class ResourceController {
     private final ToolMapService toolMapService;
     private final ToolMapRepository toolMapRepository;
 
-    @GetMapping("/resource/tool-master/{scenarioId}")
+    @GetMapping("/tool-master/{scenarioId}")
     public ResponseEntity<?> getAllToolMaster(@PathVariable String scenarioId) {
         List<ToolMaster> toolMasters = toolMasterRepository.findByToolMasterIdScenarioId(scenarioId);
 
@@ -52,9 +52,9 @@ public class ResourceController {
 
         return ResponseEntity.status(200).body(response);
     }
-    @GetMapping("/resource/tool-map/{scenarioId}")
+    @GetMapping("/tool-map/{scenarioId}")
     public ResponseEntity<?> getAllToolMap(@PathVariable String scenarioId) {
-        List<ToolMap> toolMaps = toolMapRepository.findAll();
+        List<ToolMap> toolMaps = toolMapRepository.findByToolMapIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
 
@@ -65,9 +65,9 @@ public class ResourceController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/resource/workcenter/{scenarioId}")
+    @GetMapping("/workcenter/{scenarioId}")
     public ResponseEntity<?> getAllWorkCenter(@PathVariable String scenarioId) {
-        List<WorkCenter> workCenters = workCenterRepository.findAll();
+        List<WorkCenter> workCenters = workCenterRepository.findByWorkCenterIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
 
@@ -78,9 +78,9 @@ public class ResourceController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/resource/workcentermap/{scenarioId}")
+    @GetMapping("/workcentermap/{scenarioId}")
     public ResponseEntity<?> getAllWorkCenterMap(@PathVariable String scenarioId) {
-        List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findAll();
+        List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findByWorkCenterMapIdScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
 

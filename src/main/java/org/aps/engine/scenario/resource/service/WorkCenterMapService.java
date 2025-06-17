@@ -27,22 +27,22 @@ public class WorkCenterMapService {
             Row row = sheet.getRow(i);
 
             WorkCenterMapId workCenterMapId = WorkCenterMapId.builder()
-                    .operationId(formatter.formatCellValue(row.getCell(3)))
-                    .workcenterId( formatter.formatCellValue(row.getCell(6)))
+                    .operationId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
+                    .workcenterId(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
                     .scenarioId(scenarioId)
                     .build();
 
             WorkCenterMap workCenterMap = WorkCenterMap.builder()
                     .workCenterMapId(workCenterMapId)
-                    .siteId(formatter.formatCellValue(row.getCell(0)))
-                    .routingId(formatter.formatCellValue(row.getCell(1)))
-                    .partId( formatter.formatCellValue(row.getCell(2)))
-                    .routingGroup( formatter.formatCellValue(row.getCell(4)))
-                    .routingVersion( formatter.formatCellValue(row.getCell(5)))
-                    .tactTime( formatter.formatCellValue(row.getCell(7)))
-                    .tactTimeUom( formatter.formatCellValue(row.getCell(8)))
-                    .procTime( formatter.formatCellValue(row.getCell(9)))
-                    .procTimeUom(formatter.formatCellValue(row.getCell(10)))
+                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+                    .routingId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
+                    .partId(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .routingGroup(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .routingVersion(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .tactTime(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
+                    .tactTimeUom(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
+                    .procTime(row.getCell(9) == null ? "" : formatter.formatCellValue(row.getCell(9)))
+                    .procTimeUom(row.getCell(10) == null ? "" : formatter.formatCellValue(row.getCell(10)))
                     .build();
 
             workCenterMapRepository.save(workCenterMap);

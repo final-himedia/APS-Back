@@ -27,11 +27,10 @@ public class RoutingService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId =  formatter.formatCellValue(row.getCell(0));
-            String routingIdStr =  formatter.formatCellValue(row.getCell(1));
-            String routingName = formatter.formatCellValue(row.getCell(2));
-            String routingType = formatter.formatCellValue(row.getCell(3));
-
+            String siteId = (row.getCell(0) == null) ? "" : formatter.formatCellValue(row.getCell(0));
+            String routingIdStr = (row.getCell(1) == null) ? "" : formatter.formatCellValue(row.getCell(1));
+            String routingName = (row.getCell(2) == null) ? "" : formatter.formatCellValue(row.getCell(2));
+            String routingType = (row.getCell(3) == null) ? "" : formatter.formatCellValue(row.getCell(3));
 
             RoutingId routingId = RoutingId.builder()
                     .siteId(siteId)

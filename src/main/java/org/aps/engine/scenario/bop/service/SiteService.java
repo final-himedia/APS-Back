@@ -26,8 +26,8 @@ public class SiteService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = formatter.formatCellValue(row.getCell(0));
-            String siteName = formatter.formatCellValue(row.getCell(1));
+            String siteId = (row.getCell(0) == null) ? "" : formatter.formatCellValue(row.getCell(0));
+            String siteName = (row.getCell(1) == null) ? "" : formatter.formatCellValue(row.getCell(1));
 
             Site site = Site.builder()
                     .siteId(siteId)

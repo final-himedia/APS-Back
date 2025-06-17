@@ -29,10 +29,8 @@ public class ToolMasterService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            String siteId = formatter.formatCellValue(row.getCell(0));
-
-            String toolId = formatter.formatCellValue(row.getCell(1));
-
+            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
+            String toolId = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
 
             ToolMasterId toolMasterId = ToolMasterId.builder()
                     .siteId(siteId)
@@ -40,9 +38,11 @@ public class ToolMasterService {
                     .scenarioId(scenarioId)
                     .build();
 
-            Integer cavity = Integer.valueOf(formatter.formatCellValue(row.getCell(3)));
-            String toolState = formatter.formatCellValue(row.getCell(2));
-            String toolName = formatter.formatCellValue(row.getCell(5));
+            String cavityStr = row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3));
+            Integer cavity = cavityStr.isEmpty() ? 0 : Integer.valueOf(cavityStr);
+
+            String toolState = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
+            String toolName = row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5));
 
             ToolMaster tool = ToolMaster.builder()
                     .toolMasterId(toolMasterId)

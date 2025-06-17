@@ -30,16 +30,17 @@ public class ToolMapService {
 
             ToolMapId toolMapId = ToolMapId.builder()
                     .scenarioId(scenarioId)
-                    .partId( formatter.formatCellValue(row.getCell(3)))
-                    .toolId(formatter.formatCellValue(row.getCell(4)))
+                    .partId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
+                    .toolId(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
                     .build();
 
             ToolMap tool = ToolMap.builder()
-                    .siteId( formatter.formatCellValue(row.getCell(0)))
-                    .toolSize( formatter.formatCellValue(row.getCell(1)))
-                    .partName( formatter.formatCellValue(row.getCell(5)))
+                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+                    .toolSize(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
+                    .partName(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
                     .toolMapId(toolMapId)
                     .build();
+
 
             toolMapRepository.save(tool);
         }

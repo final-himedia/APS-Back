@@ -31,7 +31,7 @@ public class ManagementController {
 
     // 사용자 전체 목록 조회
     @GetMapping("/user")
-    public ResponseEntity<List<Map<String, Object>>> allUsers(HttpServletRequest request) {
+    public ResponseEntity<?> allUsers(HttpServletRequest request) {
         User loginUser = (User) request.getAttribute("user");
 
         // 관리자가 아니면 접근 제한
@@ -53,7 +53,12 @@ public class ManagementController {
             results.add(userMap);
         }
 
-        return ResponseEntity.status(200).body(results);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("users", users);
+        response.put("total", users.size());
+
+        return ResponseEntity.status(200).body(response);
     }
 
     // 사용자 정보 수정

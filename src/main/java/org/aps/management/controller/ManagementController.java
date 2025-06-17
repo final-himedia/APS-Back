@@ -26,7 +26,7 @@ public class ManagementController {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    // 가입자 전체 목록 조회
+    // 사용자 전체 목록 조회
     @GetMapping("/user")
     public ResponseEntity<List<UserListResponse>> allUsers(HttpServletRequest request) {
         User loginUser = (User) request.getAttribute("user");
@@ -39,7 +39,6 @@ public class ManagementController {
         // 전체 사용자 조회
         List<User> users = userRepository.findAll();
 
-        // 조회한 엔티티를 UserListResponse로 변환
         List<UserListResponse> results = users.stream()
                 .map(user -> UserListResponse.builder()
                         .id(user.getId())
@@ -49,7 +48,58 @@ public class ManagementController {
                         .build())
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(results);
+        return ResponseEntity.status(200).body(results);
+    }
+
+    // 사용자 정보 수정
+    @PutMapping("/user/{id}")
+    public ResponseEntity<UserListResponse> updateUser(@PathVariable Long id,
+                                                       @RequestBody UserListResponse request,
+                                                       HttpServletRequest httpRequest) {
+        User loginUser = (User) httpRequest.getAttribute("user");
+
+        // 관리자가 아니면 접근 제한
+        if (!"Admin".equalsIgnoreCase(loginUser.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        }
+
+        // 특정 사용자 조회
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+
+        // 사용자 정보 수정
+        user.setName(request.getName());
+        user.setRole(request.getRole());
+
+        User updated = userRepository.save(user);
+
+        UserListResponse response = UserListResponse.builder()
+                .id(updated.getId())
+                .email(updated.getEmail())
+                .name(updated.getName())
+                .role(updated.getRole())
+                .build();
+
+        return ResponseEntity.status(200).body(response);
+    }
+
+    // 사용자 정보 삭제
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+        User loginUser = (User) request.getAttribute("user");
+
+        // 관리자가 아니면 접근 제한
+        if (!"Admin".equalsIgnoreCase(loginUser.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        }
+
+        // 특정 사용자 조회
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+
+        userRepository.delete(user);
+
+        return ResponseEntity.status(204).build();
     }
 
     // 전체 게시글 목록 조회
@@ -134,6 +184,7 @@ public class ManagementController {
             comment.setDeleted(true);
         }
         commentRepository.saveAll(comments);
+
 
         return ResponseEntity.status(204).build();
     }

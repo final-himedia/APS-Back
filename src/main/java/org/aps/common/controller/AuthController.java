@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @CrossOrigin
@@ -78,14 +80,12 @@ public class AuthController {
                 .withSubject(user.getEmail())
                 .sign(Algorithm.HMAC256(secret));
 
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("token", token);
+        response.put("user", user);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
 
-
-        return ResponseEntity.status(200)
-                .headers(headers)
-                .body(user); // 또는 null, 혹은 원하는 객체
+        return ResponseEntity.status(200).body(response); // 또는 null, 혹은 원하는 객체 git update
     }
 
     @PostMapping("/logout")

@@ -40,7 +40,7 @@ public class DemandService {
                     .partName(row.getCell(3) == null ? "" : row.getCell(3).getStringCellValue())
                     .customerId(row.getCell(4) == null ? "" : row.getCell(4).getStringCellValue())
                     .dueDate(row.getCell(5) == null ? null : row.getCell(5).getLocalDateTimeCellValue())
-                    .demandQty(row.getCell(6) == null ? 0.0 : row.getCell(6).getNumericCellValue())
+                    .demandQty(row.getCell(6) == null ? 0.0 : Double.valueOf(row.getCell(6).getStringCellValue()))
                     .priority(row.getCell(7) == null ? 0.0f : (float) row.getCell(7).getNumericCellValue())
                     .uom(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue())
                     .orderType(row.getCell(9) == null ? "" : row.getCell(9).getStringCellValue())

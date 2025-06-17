@@ -28,20 +28,20 @@ public class WorkCenterService {
             if (row == null) continue;
 
             WorkCenterId workCenterId = WorkCenterId.builder()
-                    .siteId(formatter.formatCellValue(row.getCell(0)))
-                    .workcenterId( formatter.formatCellValue(row.getCell(1)))
+                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+                    .workcenterId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
                     .scenarioId(scenarioId)
                     .build();
 
             WorkCenter workCenter = WorkCenter.builder()
                     .workCenterId(workCenterId)
-                    .workcenterName(formatter.formatCellValue(row.getCell(2)))
-                    .workcenterGroup( formatter.formatCellValue(row.getCell(3)))
-                    .workcenterType( formatter.formatCellValue(row.getCell(4)))
-                    .priorityId( formatter.formatCellValue(row.getCell(5)))
-                    .dispatcherType( formatter.formatCellValue(row.getCell(6)))
-                    .workcenterState( formatter.formatCellValue(row.getCell(7)))
-                    .automation( formatter.formatCellValue(row.getCell(8)))
+                    .workcenterName(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .workcenterGroup(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
+                    .workcenterType(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .priorityId(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .dispatcherType(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
+                    .workcenterState(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
+                    .automation(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
                     .build();
 
             workCenterRepository.save(workCenter);

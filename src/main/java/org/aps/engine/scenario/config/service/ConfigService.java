@@ -31,18 +31,20 @@ public class ConfigService {
             Row row = sheet.getRow(i);
 
             PriorityId priorityId = PriorityId.builder()
-                    .priorityId(formatter.formatCellValue(row.getCell(0)))
-                    .factorId(formatter.formatCellValue(row.getCell(1)))
+                    .priorityId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+                    .factorId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
                     .scenarioId(scenarioId)
                     .build();
 
             Priority priority = Priority.builder()
                     .priorityId(priorityId)
-                    .factorType(formatter.formatCellValue(row.getCell(2)))
-                    .orderType(formatter.formatCellValue(row.getCell(3)))
-                    .sequence(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
-                    .description(formatter.formatCellValue(row.getCell(5)))
+                    .factorType(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .orderType(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
+                    .sequence((row.getCell(4) == null || formatter.formatCellValue(row.getCell(4)).isEmpty())
+                            ? 0 : Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
+                    .description(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
                     .build();
+
 
             priorityRepository.save(priority);
         }
@@ -80,6 +82,7 @@ public class ConfigService {
             } else {
                 row.createCell(4).setCellValue(priority.getSequence());
             }
+
             row.createCell(5).setCellValue(priority.getDescription() == null ? "" : priority.getDescription());
             row.createCell(6).setCellValue(scenarioId);
 

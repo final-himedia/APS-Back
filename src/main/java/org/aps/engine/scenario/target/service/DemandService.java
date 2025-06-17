@@ -28,28 +28,28 @@ public class DemandService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            DemandId demandId = DemandId.builder().
-                    demandId(row.getCell(0).getStringCellValue()).
-                    siteId(row.getCell(1).getStringCellValue()).
-                    partId(row.getCell(2).getStringCellValue()).
-                    scenarioId(scenarioId).
-                    build();
+            DemandId demandId = DemandId.builder()
+                    .demandId(row.getCell(0) == null ? "" : row.getCell(0).getStringCellValue())
+                    .siteId(row.getCell(1) == null ? "" : row.getCell(1).getStringCellValue())
+                    .partId(row.getCell(2) == null ? "" : row.getCell(2).getStringCellValue())
+                    .scenarioId(scenarioId)
+                    .build();
 
-            Demand demand = Demand.builder().
-                    demandId(demandId).
-                    partName(row.getCell(3).getStringCellValue()).
-                    customerId(row.getCell(4).getStringCellValue()).
-                    dueDate(row.getCell(5).getLocalDateTimeCellValue()).
-                    demandQty(row.getCell(6).getNumericCellValue()).
-                    priority((float) row.getCell(7).getNumericCellValue()).
-                    uom(row.getCell(8).getStringCellValue()).
-                    orderType(row.getCell(9).getStringCellValue()).
-                    orderTypeName(row.getCell(10).getStringCellValue()).
-                    exceptYn(row.getCell(11).getStringCellValue()).
-                    headerCreationDate(row.getCell(12).getLocalDateTimeCellValue()).
-                    hasOverActQty(row.getCell(13).getBooleanCellValue()).
+            Demand demand = Demand.builder()
+                    .demandId(demandId)
+                    .partName(row.getCell(3) == null ? "" : row.getCell(3).getStringCellValue())
+                    .customerId(row.getCell(4) == null ? "" : row.getCell(4).getStringCellValue())
+                    .dueDate(row.getCell(5) == null ? null : row.getCell(5).getLocalDateTimeCellValue())
+                    .demandQty(row.getCell(6) == null ? 0.0 : row.getCell(6).getNumericCellValue())
+                    .priority(row.getCell(7) == null ? 0.0f : (float) row.getCell(7).getNumericCellValue())
+                    .uom(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue())
+                    .orderType(row.getCell(9) == null ? "" : row.getCell(9).getStringCellValue())
+                    .orderTypeName(row.getCell(10) == null ? "" : row.getCell(10).getStringCellValue())
+                    .exceptYn(row.getCell(11) == null ? "" : row.getCell(11).getStringCellValue())
+                    .headerCreationDate(row.getCell(12) == null ? null : row.getCell(12).getLocalDateTimeCellValue())
+                    .hasOverActQty(row.getCell(13) != null && row.getCell(13).getBooleanCellValue())
+                    .build();
 
-                    build();
 
             demandRepository.save(demand);
         }
@@ -96,7 +96,7 @@ public class DemandService {
             row.createCell(11).setCellValue(demand.getExceptYn() == null ? "" : demand.getExceptYn());
             row.createCell(12).setCellValue(demand.getHeaderCreationDate() == null ? "" : demand.getHeaderCreationDate().toString());
             row.createCell(13).setCellValue(demand.getHasOverActQty() == null ? "" : demand.getHasOverActQty().toString());
-            row.createCell(14).setCellValue(id.getScenarioId() == null ? "" : id.getScenarioId());
+            row.createCell(14).setCellValue(scenarioId);
 
         }
 

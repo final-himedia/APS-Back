@@ -27,10 +27,10 @@ public class OperationRoutingService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = formatter.formatCellValue(row.getCell(0));
-            String routingId = formatter.formatCellValue(row.getCell(1));
-            String operationId = formatter.formatCellValue(row.getCell(2));
-            String operationSeqStr = formatter.formatCellValue(row.getCell(4));
+            String siteId = (row.getCell(0) == null) ? "" : formatter.formatCellValue(row.getCell(0));
+            String routingId = (row.getCell(1) == null) ? "" : formatter.formatCellValue(row.getCell(1));
+            String operationId = (row.getCell(2) == null) ? "" : formatter.formatCellValue(row.getCell(2));
+            String operationSeqStr = (row.getCell(4) == null) ? "" : formatter.formatCellValue(row.getCell(4));
             int operationSeq;
 
             try {

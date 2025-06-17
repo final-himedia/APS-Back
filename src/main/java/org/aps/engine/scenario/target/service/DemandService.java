@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,7 +40,7 @@ public class DemandService {
                     .demandId(demandId)
                     .partName(row.getCell(3) == null ? "" : row.getCell(3).getStringCellValue())
                     .customerId(row.getCell(4) == null ? "" : row.getCell(4).getStringCellValue())
-                    .dueDate(row.getCell(5) == null ? null : row.getCell(5).getLocalDateTimeCellValue())
+                    .dueDate(row.getCell(5) == null ? null : LocalDateTime.parse(row.getCell(5).getStringCellValue()))
                     .demandQty(row.getCell(6) == null ? 0.0 : Double.valueOf(row.getCell(6).getStringCellValue()))
                     .priority(row.getCell(7) == null ? 0.0f : (float) row.getCell(7).getNumericCellValue())
                     .uom(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue())

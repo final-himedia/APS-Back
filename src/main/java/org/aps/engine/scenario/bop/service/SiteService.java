@@ -59,7 +59,7 @@ public class SiteService {
             Row row = sheet.createRow(rowIdx++);
             row.createCell(0).setCellValue(site.getSiteId() == null ? "" : site.getSiteId());
             row.createCell(1).setCellValue(site.getSiteName() == null ? "" : site.getSiteName());
-            row.createCell(2).setCellValue(site.getScenarioId() == null ? "" : site.getScenarioId());
+            row.createCell(2).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

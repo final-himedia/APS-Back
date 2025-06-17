@@ -92,45 +92,45 @@ public class ResourceController {
     }
 
     @PostMapping("/tool-upload")
-    public ResponseEntity<String > uploadToolExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        toolMasterService.excelHandle(file);
+    public ResponseEntity<String > uploadToolExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String s) throws IOException {
+        toolMasterService.excelHandle(file,s);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/tool-download")
-    private void downloadToolExcel(HttpServletResponse response) throws IOException {
-        toolMasterService.exportToolExcel(response);
+    private void downloadToolExcel(HttpServletResponse response, @RequestParam("scenarioId") String s) throws IOException {
+        toolMasterService.exportToolExcel(s,response);
     }
     @PostMapping("/workcenter-upload")
-    public ResponseEntity<String > uploadWorkcenterExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        workCenterService.excelHandle(file);
+    public ResponseEntity<String > uploadWorkcenterExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String s) throws IOException {
+        workCenterService.excelHandle(file,s);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/workcenter-download")
-    private void downloadWorkcenterExcel(HttpServletResponse response) throws IOException {
-        workCenterService.exportWorkCenterExcel(response);
+    private void downloadWorkcenterExcel(HttpServletResponse response, @RequestParam("scenarioId") String s) throws IOException {
+        workCenterService.exportWorkCenterExcel(s,response);
     }
     @PostMapping("/workcentermap-upload")
-    public ResponseEntity<String > uploadWorkcenterMapExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        workCenterMapService.excelHandle(file);
+    public ResponseEntity<String > uploadWorkcenterMapExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String s) throws IOException {
+        workCenterMapService.excelHandle(file,s);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/workcentermap-download")
-    private void downloadWorkcenterMapExcel(HttpServletResponse response) throws IOException {
-        workCenterMapService.exportWorkCenterMapExcel(response);
+    private void downloadWorkcenterMapExcel(HttpServletResponse response, @RequestParam("scenarioId") String s) throws IOException {
+        workCenterMapService.exportWorkCenterMapExcel(s,response);
     }
 
     @PostMapping("/toolmap-upload")
-    public ResponseEntity<String > uploadToolMapExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        toolMapService.excelHandle(file);
+    public ResponseEntity<String > uploadToolMapExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String s) throws IOException {
+        toolMapService.excelHandle(file,s);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/toolmap-download")
-    private void downloadToolMapExcel(HttpServletResponse response) throws IOException {
-        toolMapService.exportToolMapExcel(response);
+    private void downloadToolMapExcel(HttpServletResponse response, @RequestParam("scenarioId") String s) throws IOException {
+        toolMapService.exportToolMapExcel(s,response);
     }
 
 }

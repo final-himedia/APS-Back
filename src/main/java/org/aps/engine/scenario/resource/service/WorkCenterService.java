@@ -18,7 +18,7 @@ import java.util.List;
 public class WorkCenterService {
     private final WorkCenterRepository workCenterRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -28,27 +28,27 @@ public class WorkCenterService {
             if (row == null) continue;
 
             WorkCenterId workCenterId = WorkCenterId.builder()
-                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
-                    .workcenterId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
-                    .scenarioId(row.getCell(9) == null ? "" : formatter.formatCellValue(row.getCell(9)))
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .workcenterId( formatter.formatCellValue(row.getCell(1)))
+                    .scenarioId(scenarioId)
                     .build();
 
             WorkCenter workCenter = WorkCenter.builder()
                     .workCenterId(workCenterId)
-                    .workcenterName(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
-                    .workcenterGroup(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
-                    .workcenterType(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
-                    .priorityId(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
-                    .dispatcherType(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
-                    .workcenterState(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
-                    .automation(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
+                    .workcenterName(formatter.formatCellValue(row.getCell(2)))
+                    .workcenterGroup( formatter.formatCellValue(row.getCell(3)))
+                    .workcenterType( formatter.formatCellValue(row.getCell(4)))
+                    .priorityId( formatter.formatCellValue(row.getCell(5)))
+                    .dispatcherType( formatter.formatCellValue(row.getCell(6)))
+                    .workcenterState( formatter.formatCellValue(row.getCell(7)))
+                    .automation( formatter.formatCellValue(row.getCell(8)))
                     .build();
 
             workCenterRepository.save(workCenter);
         }
     }
 
-    public void exportWorkCenterExcel(HttpServletResponse response) throws IOException {
+    public void exportWorkCenterExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<WorkCenter> workCenters = workCenterRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
@@ -80,7 +80,7 @@ public class WorkCenterService {
             row.createCell(6).setCellValue(workCenter.getDispatcherType() != null ? workCenter.getDispatcherType() : "");
             row.createCell(7).setCellValue(workCenter.getWorkcenterState() != null ? workCenter.getWorkcenterState() : "");
             row.createCell(8).setCellValue(workCenter.getAutomation() != null ? workCenter.getAutomation() : "");
-            row.createCell(9).setCellValue(id != null && id.getScenarioId() != null ? id.getScenarioId() : "");
+            row.createCell(9).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

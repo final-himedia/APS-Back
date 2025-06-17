@@ -21,7 +21,7 @@ import java.util.List;
 public class DemandService {
     private final DemandRepository demandRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
@@ -32,7 +32,7 @@ public class DemandService {
                     demandId(row.getCell(0).getStringCellValue()).
                     siteId(row.getCell(1).getStringCellValue()).
                     partId(row.getCell(2).getStringCellValue()).
-                    scenarioId(row.getCell(14).getStringCellValue()).
+                    scenarioId(scenarioId).
                     build();
 
             Demand demand = Demand.builder().
@@ -54,7 +54,7 @@ public class DemandService {
             demandRepository.save(demand);
         }
     }
-    public void exportDemandExcel(HttpServletResponse response) throws IOException {
+    public void exportDemandExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<Demand> demands = demandRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
@@ -82,21 +82,22 @@ public class DemandService {
             Row row = sheet.createRow(rowIdx++);
             DemandId id = demand.getDemandId();
 
-            row.createCell(0).setCellValue(id.getDemandId());
-            row.createCell(1).setCellValue(id.getSiteId());
-            row.createCell(2).setCellValue(id.getPartId());
-            row.createCell(3).setCellValue(demand.getPartName());
-            row.createCell(4).setCellValue(demand.getCustomerId());
-            row.createCell(5).setCellValue(demand.getDueDate().toString());
-            row.createCell(6).setCellValue(demand.getDemandQty());
-            row.createCell(7).setCellValue(demand.getPriority());
-            row.createCell(8).setCellValue(demand.getUom());
-            row.createCell(9).setCellValue(demand.getOrderType());
-            row.createCell(10).setCellValue(demand.getOrderTypeName());
-            row.createCell(11).setCellValue(demand.getExceptYn());
-            row.createCell(12).setCellValue(demand.getHeaderCreationDate().toString());
-            row.createCell(13).setCellValue(demand.getHasOverActQty().toString());
-            row.createCell(14).setCellValue(id.getScenarioId());
+            row.createCell(0).setCellValue(id.getDemandId() == null ? "" : id.getDemandId());
+            row.createCell(1).setCellValue(id.getSiteId() == null ? "" : id.getSiteId());
+            row.createCell(2).setCellValue(id.getPartId() == null ? "" : id.getPartId());
+            row.createCell(3).setCellValue(demand.getPartName() == null ? "" : demand.getPartName());
+            row.createCell(4).setCellValue(demand.getCustomerId() == null ? "" : demand.getCustomerId());
+            row.createCell(5).setCellValue(demand.getDueDate() == null ? "" : demand.getDueDate().toString());
+            row.createCell(6).setCellValue(demand.getDemandQty() == null ? "" : demand.getDemandQty().toString());
+            row.createCell(7).setCellValue(demand.getPriority() == null ? "" : demand.getPriority().toString());
+            row.createCell(8).setCellValue(demand.getUom() == null ? "" : demand.getUom());
+            row.createCell(9).setCellValue(demand.getOrderType() == null ? "" : demand.getOrderType());
+            row.createCell(10).setCellValue(demand.getOrderTypeName() == null ? "" : demand.getOrderTypeName());
+            row.createCell(11).setCellValue(demand.getExceptYn() == null ? "" : demand.getExceptYn());
+            row.createCell(12).setCellValue(demand.getHeaderCreationDate() == null ? "" : demand.getHeaderCreationDate().toString());
+            row.createCell(13).setCellValue(demand.getHasOverActQty() == null ? "" : demand.getHasOverActQty().toString());
+            row.createCell(14).setCellValue(id.getScenarioId() == null ? "" : id.getScenarioId());
+
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

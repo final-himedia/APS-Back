@@ -20,7 +20,7 @@ import java.util.List;
 public class ToolMapService {
     private final ToolMapRepository toolMapRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -29,15 +29,15 @@ public class ToolMapService {
             Row row = sheet.getRow(i);
 
             ToolMapId toolMapId = ToolMapId.builder()
-                    .scenarioId(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
-                    .partId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
-                    .toolId(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .scenarioId(scenarioId)
+                    .partId( formatter.formatCellValue(row.getCell(3)))
+                    .toolId(formatter.formatCellValue(row.getCell(4)))
                     .build();
 
             ToolMap tool = ToolMap.builder()
-                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
-                    .toolSize(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
-                    .partName(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .siteId( formatter.formatCellValue(row.getCell(0)))
+                    .toolSize( formatter.formatCellValue(row.getCell(1)))
+                    .partName( formatter.formatCellValue(row.getCell(5)))
                     .toolMapId(toolMapId)
                     .build();
 
@@ -45,7 +45,7 @@ public class ToolMapService {
         }
     }
 
-    public void exportToolMapExcel(HttpServletResponse response) throws IOException {
+    public void exportToolMapExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<ToolMap> tools = toolMapRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
@@ -70,7 +70,6 @@ public class ToolMapService {
             String toolSize = tool.getToolSize() == null ? "" : tool.getToolSize();
 
             ToolMapId toolMapId = tool.getToolMapId();
-            String scenarioId = (toolMapId == null || toolMapId.getScenarioId() == null) ? "" : toolMapId.getScenarioId();
             String partId = (toolMapId == null || toolMapId.getPartId() == null) ? "" : toolMapId.getPartId();
             String toolId = (toolMapId == null || toolMapId.getToolId() == null) ? "" : toolMapId.getToolId();
 

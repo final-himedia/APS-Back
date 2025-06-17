@@ -40,13 +40,13 @@ public class ConfigController {
     }
 
     @PostMapping("/priority-upload")
-    public ResponseEntity<String > uploadPriorityExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        configService.excelHandle(file);
+    public ResponseEntity<String > uploadPriorityExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String s) throws IOException {
+        configService.excelHandle(file,s);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/priority-download")
-    private void downloadPriorityExcel(HttpServletResponse response) throws IOException {
-        configService.exportPriorityExcel(response);
+    private void downloadPriorityExcel(HttpServletResponse response, @RequestParam("scenarioId") String s) throws IOException {
+        configService.exportPriorityExcel(s,response);
     }
 }

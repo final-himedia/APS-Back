@@ -63,9 +63,9 @@ public class ManagementController {
 
     // 사용자 정보 수정
     @PutMapping("/user/{id}")
-    public ResponseEntity<Map<String, Object>> updateUser(@PathVariable Long id,
-                                                          @RequestBody UserListResponse request,
-                                                          HttpServletRequest httpRequest) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id,
+                                        @RequestBody UserListResponse request,
+                                        HttpServletRequest httpRequest) {
         User loginUser = (User) httpRequest.getAttribute("user");
 
         // 관리자가 아니면 접근 제한
@@ -93,8 +93,12 @@ public class ManagementController {
         response.put("name", updated.getName());
         response.put("role", updated.getRole());
 
+        Map<String, Object> update = new LinkedHashMap<>();
+        update.put("status", 200);
+        update.put("updated", updated);
+        update.put("total", update.size());
 
-        return ResponseEntity.status(200).body(response);
+        return ResponseEntity.status(200).body(update);
     }
 
     // 사용자 정보 삭제

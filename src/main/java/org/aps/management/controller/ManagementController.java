@@ -3,10 +3,12 @@ package org.aps.management.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aps.common.entity.User;
+import org.aps.common.repository.UserRepository;
 import org.aps.management.entity.Comment;
 import org.aps.management.entity.Qna;
 import org.aps.management.repository.CommentRepository;
 import org.aps.management.repository.QnaRepository;
+import org.aps.management.response.UserListResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,22 +19,48 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/management/qna")
+@RequestMapping("/api/management")
 @RequiredArgsConstructor
 public class ManagementController {
-
     private final QnaRepository qnaRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+
+    // 가입자 전체 목록 조회
+    @GetMapping("/user")
+    public ResponseEntity<List<UserListResponse>> allUsers(HttpServletRequest request) {
+        User loginUser = (User) request.getAttribute("user");
+
+        // 관리자가 아니면 접근 제한
+        if (!"Admin".equalsIgnoreCase(loginUser.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
+        }
+
+        // 전체 사용자 조회
+        List<User> users = userRepository.findAll();
+
+        // 조회한 엔티티를 UserListResponse로 변환
+        List<UserListResponse> results = users.stream()
+                .map(user -> UserListResponse.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .role(user.getRole())
+                        .build())
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(results);
+    }
 
     // 전체 게시글 목록 조회
-    @GetMapping
-    public ResponseEntity<List<Qna>> AllQna() {
+    @GetMapping("/qna")
+    public ResponseEntity<List<Qna>> allQnas() {
         List<Qna> qnas = qnaRepository.findByDeletedFalse();
         return ResponseEntity.status(200).body(qnas);
     }
 
     // 게시글 상세 조회
-    @GetMapping("/{id}")
+    @GetMapping("/qna/{id}")
     public ResponseEntity<Qna> detailQna(@PathVariable Integer id) {
         Qna qna = qnaRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."));
@@ -41,7 +69,7 @@ public class ManagementController {
     }
 
     // 게시글 등록
-    @PostMapping
+    @PostMapping("/qna")
     public ResponseEntity<Qna> createQna(@RequestBody Qna request, HttpServletRequest httpRequest) {
         User loginUser = (User) httpRequest.getAttribute("user");
 
@@ -59,7 +87,7 @@ public class ManagementController {
     }
 
     // 게시글 수정
-    @PutMapping("/{id}")
+    @PutMapping("/qna/{id}")
     public ResponseEntity<Qna> updateQna(@PathVariable Integer id,
                                          @RequestBody Qna request,
                                          HttpServletRequest httpRequest) {
@@ -85,7 +113,7 @@ public class ManagementController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/qna/{id}")
     public ResponseEntity<Void> deleteQna(@PathVariable Integer id, HttpServletRequest httpRequest) {
         User loginUser = (User) httpRequest.getAttribute("user");
 
@@ -111,7 +139,7 @@ public class ManagementController {
     }
 
     // 게시글 검색
-    @GetMapping("/search")
+    @GetMapping("/qna/search")
     public ResponseEntity<List<Qna>> searchQna(@RequestParam String title) {
         List<Qna> results = qnaRepository.findByTitleAndDeletedFalse(title);
         if (results.isEmpty()) {
@@ -122,14 +150,14 @@ public class ManagementController {
     }
 
     // 댓글 목록 조회
-    @GetMapping("/{qnaId}/comment")
+    @GetMapping("/qna/{qnaId}/comment")
     public ResponseEntity<List<Comment>> getComments(@PathVariable Integer qnaId) {
         List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalse(qnaId);
         return ResponseEntity.status(200).body(comments);
     }
 
     // 댓글 등록
-    @PostMapping("/{qnaId}/comment")
+    @PostMapping("/qna/{qnaId}/comment")
     public ResponseEntity<Comment> createComment(@PathVariable Integer qnaId,
                                                  @RequestBody Comment request,
                                                  HttpServletRequest httpRequest) {
@@ -152,7 +180,7 @@ public class ManagementController {
     }
 
     // 댓글 수정
-    @PutMapping("/{qnaId}/comment/{commentId}")
+    @PutMapping("/qna/{qnaId}/comment/{commentId}")
     public ResponseEntity<Comment> updateComment(@PathVariable Integer qnaId,
                                                  @PathVariable Integer commentId,
                                                  @RequestBody Comment request,
@@ -171,7 +199,7 @@ public class ManagementController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/{qnaId}/comment/{commentId}")
+    @DeleteMapping("/qna/{qnaId}/comment/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer qnaId,
                                               @PathVariable Integer commentId,
                                               HttpServletRequest httpRequest) {

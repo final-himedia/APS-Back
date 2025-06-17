@@ -18,7 +18,7 @@ import java.util.List;
 public class WorkCenterMapService {
     private final WorkCenterMapRepository workCenterMapRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -27,22 +27,22 @@ public class WorkCenterMapService {
             Row row = sheet.getRow(i);
 
             WorkCenterMapId workCenterMapId = WorkCenterMapId.builder()
-                    .operationId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
-                    .workcenterId(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
-                    .scenarioId(row.getCell(11) == null ? "" : formatter.formatCellValue(row.getCell(11)))
+                    .operationId(formatter.formatCellValue(row.getCell(3)))
+                    .workcenterId( formatter.formatCellValue(row.getCell(6)))
+                    .scenarioId(scenarioId)
                     .build();
 
             WorkCenterMap workCenterMap = WorkCenterMap.builder()
                     .workCenterMapId(workCenterMapId)
-                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
-                    .routingId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
-                    .partId(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
-                    .routingGroup(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
-                    .routingVersion(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
-                    .tactTime(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
-                    .tactTimeUom(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
-                    .procTime(row.getCell(9) == null ? "" : formatter.formatCellValue(row.getCell(9)))
-                    .procTimeUom(row.getCell(10) == null ? "" : formatter.formatCellValue(row.getCell(10)))
+                    .siteId(formatter.formatCellValue(row.getCell(0)))
+                    .routingId(formatter.formatCellValue(row.getCell(1)))
+                    .partId( formatter.formatCellValue(row.getCell(2)))
+                    .routingGroup( formatter.formatCellValue(row.getCell(4)))
+                    .routingVersion( formatter.formatCellValue(row.getCell(5)))
+                    .tactTime( formatter.formatCellValue(row.getCell(7)))
+                    .tactTimeUom( formatter.formatCellValue(row.getCell(8)))
+                    .procTime( formatter.formatCellValue(row.getCell(9)))
+                    .procTimeUom(formatter.formatCellValue(row.getCell(10)))
                     .build();
 
             workCenterMapRepository.save(workCenterMap);
@@ -50,7 +50,7 @@ public class WorkCenterMapService {
     }
 
 
-    public void exportWorkCenterMapExcel(HttpServletResponse response) throws IOException {
+    public void exportWorkCenterMapExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
@@ -83,7 +83,7 @@ public class WorkCenterMapService {
             row.createCell(8).setCellValue(map.getTactTimeUom() == null ? "" : map.getTactTimeUom());
             row.createCell(9).setCellValue(map.getProcTime() == null ? "" : map.getProcTime());
             row.createCell(10).setCellValue(map.getProcTimeUom() == null ? "" : map.getProcTimeUom());
-            row.createCell(11).setCellValue(wcId != null && wcId.getScenarioId() != null ? wcId.getScenarioId() : "");
+            row.createCell(11).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

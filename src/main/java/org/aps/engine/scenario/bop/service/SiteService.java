@@ -17,7 +17,7 @@ import java.util.List;
 public class SiteService {
     private final SiteRepository siteRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -26,9 +26,8 @@ public class SiteService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
-            String siteName = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
-            String scenarioId = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
+            String siteId = formatter.formatCellValue(row.getCell(0));
+            String siteName = formatter.formatCellValue(row.getCell(1));
 
             Site site = Site.builder()
                     .siteId(siteId)
@@ -42,7 +41,7 @@ public class SiteService {
         workbook.close();
     }
 
-    public void exportSiteExcel(HttpServletResponse response) throws IOException {
+    public void exportSiteExcel(String scenarioId,HttpServletResponse response) throws IOException {
         List<Site> sites = siteRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();

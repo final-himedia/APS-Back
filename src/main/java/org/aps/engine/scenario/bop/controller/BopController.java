@@ -164,65 +164,65 @@ public class BopController {
     }
 
     @PostMapping("/bom-upload")
-    public ResponseEntity<String> uploadBomExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        bomService.excelHandle(file);
+    public ResponseEntity<String> uploadBomExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String scenarioId) throws IOException {
+        bomService.excelHandle(file, scenarioId);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/bom-download")
-    public void downloadBomExcel(HttpServletResponse response) throws IOException {
-        bomService.exportBomExcel(response);
+    public void downloadBomExcel(@RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
+        bomService.exportBomExcel(scenarioId, response);
     }
 
 
     @PostMapping("/operation-upload")
-    public ResponseEntity<String > uploadOperationExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        operationService.excelHandle(file);
+    public ResponseEntity<String > uploadOperationExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String scenarioId) throws IOException {
+        operationService.excelHandle(file, scenarioId);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/operation-download")
-    private void downloadOperationExcel(HttpServletResponse response) throws IOException {
-        operationService.exportOperationExcel(response);
+    private void downloadOperationExcel( @RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
+        operationService.exportOperationExcel(scenarioId,response);
     }
     @PostMapping("/operation-routing-upload")
-    public ResponseEntity<String > uploadOperationRoutingExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        operationRoutingService.excelHandle(file);
+    public ResponseEntity<String > uploadOperationRoutingExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
+        operationRoutingService.excelHandle(file,scenarioId);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/operation-routing-download")
-    private void downloadOperationRoutingExcel(HttpServletResponse response) throws IOException {
-        operationRoutingService.exportOperationRoutingExcel(response);
+    private void downloadOperationRoutingExcel(@RequestParam("scenarioId") String scenarioId,HttpServletResponse response) throws IOException {
+        operationRoutingService.exportOperationRoutingExcel(scenarioId,response);
     }
     @PostMapping("/part-upload")
-    public ResponseEntity<String > uploadPartExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        partService.excelHandle(file);
+    public ResponseEntity<String > uploadPartExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
+        partService.excelHandle(file, scenarioId);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/part-download")
-    private void downloadPartExcel(HttpServletResponse response) throws IOException {
-        partService.exportPartExcel(response);
+    private void downloadPartExcel(@RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
+        partService.exportPartExcel(scenarioId,response);
     }
     @PostMapping("/site-upload")
-    public ResponseEntity<String > uploadSiteExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        siteService.excelHandle(file);
+    public ResponseEntity<String > uploadSiteExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
+        siteService.excelHandle(file,scenarioId);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/site-download")
-    private void downloadSiteExcel(HttpServletResponse response) throws IOException {
-        siteService.exportSiteExcel(response);
+    private void downloadSiteExcel(@RequestParam("scenarioId") String scenarioId,HttpServletResponse response) throws IOException {
+        siteService.exportSiteExcel(scenarioId,response);
     }
     @PostMapping("/routing-upload")
-    public ResponseEntity<String > uploadRoutingExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        routingService.routingExcelHandle(file);
+    public ResponseEntity<String > uploadRoutingExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
+        routingService.routingExcelHandle(file,scenarioId);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/routing-download")
-    private void downloadRoutingExcel(HttpServletResponse response) throws IOException {
-        routingService.exportRoutingExcel(response);
+    private void downloadRoutingExcel(@RequestParam("scenarioId") String scenarioId,HttpServletResponse response) throws IOException {
+        routingService.exportRoutingExcel(scenarioId,response);
     }
 }

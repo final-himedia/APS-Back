@@ -36,13 +36,13 @@ public class TargetController {
     }
 
     @PostMapping("/demand-upload")
-    public ResponseEntity<String > uploadDemandExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        demandService.excelHandle(file);
+    public ResponseEntity<String > uploadDemandExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String s) throws IOException {
+        demandService.excelHandle(file,s);
         return ResponseEntity.ok("엑셀 업로드 완료");
     }
 
     @GetMapping("/demand-download")
-    private void downloadDemandExcel(HttpServletResponse response) throws IOException {
-        demandService.exportDemandExcel(response);
+    private void downloadDemandExcel(HttpServletResponse response, @RequestParam("scenarioId") String s) throws IOException {
+        demandService.exportDemandExcel(s,response);
     }
 }

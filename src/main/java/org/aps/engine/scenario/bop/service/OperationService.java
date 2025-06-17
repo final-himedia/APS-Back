@@ -18,7 +18,7 @@ import java.util.List;
 public class OperationService {
     private final OperationRepository operationRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
         DataFormatter formatter = new DataFormatter();
@@ -27,9 +27,9 @@ public class OperationService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
-            String operationIdStr = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
-            String scenarioId = row.getCell(12) == null ? "" : formatter.formatCellValue(row.getCell(12));
+            String siteId = formatter.formatCellValue(row.getCell(0));
+            String operationIdStr =  formatter.formatCellValue(row.getCell(1));
+
 
             OperationId operationId = OperationId.builder()
                     .siteId(siteId)
@@ -39,17 +39,17 @@ public class OperationService {
 
             Operation operation = Operation.builder()
                     .operationId(operationId)
-                    .operationName(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
-                    .runTime(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
-                    .yield(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
-                    .waitTime(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
-                    .transferTime(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
-                    .runTimeUom(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
-                    .operationSeq(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
-                    .operationType(row.getCell(9) == null ? "" : formatter.formatCellValue(row.getCell(9)))
-                    .waitTimeUom(row.getCell(10) == null ? "" : formatter.formatCellValue(row.getCell(10)))
-                    .transferTimeUom(row.getCell(11) == null ? "" : formatter.formatCellValue(row.getCell(11)))
-                    .sourcingType(row.getCell(13) == null ? "" : formatter.formatCellValue(row.getCell(13)))
+                    .operationName(formatter.formatCellValue(row.getCell(2)))
+                    .runTime( formatter.formatCellValue(row.getCell(3)))
+                    .yield( formatter.formatCellValue(row.getCell(4)))
+                    .waitTime( formatter.formatCellValue(row.getCell(5)))
+                    .transferTime( formatter.formatCellValue(row.getCell(6)))
+                    .runTimeUom( formatter.formatCellValue(row.getCell(7)))
+                    .operationSeq( formatter.formatCellValue(row.getCell(8)))
+                    .operationType( formatter.formatCellValue(row.getCell(9)))
+                    .waitTimeUom( formatter.formatCellValue(row.getCell(10)))
+                    .transferTimeUom( formatter.formatCellValue(row.getCell(11)))
+                    .sourcingType( formatter.formatCellValue(row.getCell(13)))
                     .build();
 
             operationRepository.save(operation);
@@ -57,7 +57,7 @@ public class OperationService {
         workbook.close();
     }
 
-    public void exportOperationExcel(HttpServletResponse response) throws IOException {
+    public void exportOperationExcel(String scenarioId,HttpServletResponse response) throws IOException {
         List<Operation> operations = operationRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();

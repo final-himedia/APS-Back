@@ -18,7 +18,7 @@ import java.util.List;
 public class RoutingService {
     private final RoutingRepository routingRepository;
 
-    public void routingExcelHandle(MultipartFile file) throws IOException {
+    public void routingExcelHandle(MultipartFile file, String scenarioId) throws IOException {
         DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -27,11 +27,11 @@ public class RoutingService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
-            String routingIdStr = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
-            String routingName = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
-            String routingType = row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3));
-            String scenarioId = row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4));
+            String siteId =  formatter.formatCellValue(row.getCell(0));
+            String routingIdStr =  formatter.formatCellValue(row.getCell(1));
+            String routingName = formatter.formatCellValue(row.getCell(2));
+            String routingType = formatter.formatCellValue(row.getCell(3));
+
 
             RoutingId routingId = RoutingId.builder()
                     .siteId(siteId)
@@ -51,7 +51,7 @@ public class RoutingService {
         workbook.close();
     }
 
-    public void exportRoutingExcel(HttpServletResponse response) throws IOException {
+    public void exportRoutingExcel(String scenarioId,HttpServletResponse response) throws IOException {
         List<Routing> routings = routingRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();

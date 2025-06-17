@@ -18,7 +18,7 @@ import java.util.List;
 public class PartService {
     private final PartRepository partRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
         DataFormatter formatter = new DataFormatter();
@@ -27,15 +27,15 @@ public class PartService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
-            String partIdStr = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
-            String partType = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
-            String routingId = row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3));
-            String partName = row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4));
-            String minBatchStr = row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5));
-            String maxBatchStr = row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6));
-            String uom = row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7));
-            String scenarioId = row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8));
+            String siteId =  formatter.formatCellValue(row.getCell(0));
+            String partIdStr = formatter.formatCellValue(row.getCell(1));
+            String partType =  formatter.formatCellValue(row.getCell(2));
+            String routingId = formatter.formatCellValue(row.getCell(3));
+            String partName =  formatter.formatCellValue(row.getCell(4));
+            String minBatchStr =  formatter.formatCellValue(row.getCell(5));
+            String maxBatchStr =  formatter.formatCellValue(row.getCell(6));
+            String uom =  formatter.formatCellValue(row.getCell(7));
+
 
             int minBatchSize = minBatchStr.isEmpty() ? 0 : Integer.parseInt(minBatchStr);
             int maxBatchSize = maxBatchStr.isEmpty() ? 0 : Integer.parseInt(maxBatchStr);
@@ -61,7 +61,7 @@ public class PartService {
         workbook.close();
     }
 
-    public void exportPartExcel(HttpServletResponse response) throws IOException {
+    public void exportPartExcel(String scenarioId,HttpServletResponse response) throws IOException {
         List<Part> parts = partRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();

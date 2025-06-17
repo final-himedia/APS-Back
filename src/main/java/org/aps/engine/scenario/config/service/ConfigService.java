@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -21,7 +22,7 @@ public class ConfigService {
 
     private final PriorityRepository priorityRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         DataFormatter formatter = new DataFormatter();
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -32,7 +33,7 @@ public class ConfigService {
             PriorityId priorityId = PriorityId.builder()
                     .priorityId(formatter.formatCellValue(row.getCell(0)))
                     .factorId(formatter.formatCellValue(row.getCell(1)))
-                    .scenarioId(formatter.formatCellValue(row.getCell(6)))
+                    .scenarioId(scenarioId)
                     .build();
 
             Priority priority = Priority.builder()
@@ -48,7 +49,7 @@ public class ConfigService {
     }
 
 
-    public void exportPriorityExcel(HttpServletResponse response) throws IOException {
+    public void exportPriorityExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<Priority> priorities = priorityRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();
@@ -70,13 +71,18 @@ public class ConfigService {
             Row row = sheet.createRow(rowIdx++);
             PriorityId id = priority.getPriorityId();
 
-            row.createCell(0).setCellValue(id.getPriorityId());
-            row.createCell(1).setCellValue(id.getFactorId());
-            row.createCell(2).setCellValue(priority.getFactorType());
-            row.createCell(3).setCellValue(priority.getOrderType());
-            row.createCell(4).setCellValue(priority.getSequence());
-            row.createCell(5).setCellValue(priority.getDescription());
-            row.createCell(6).setCellValue(id.getScenarioId());
+            row.createCell(0).setCellValue(id.getPriorityId() == null ? "" : id.getPriorityId());
+            row.createCell(1).setCellValue(id.getFactorId() == null ? "" : id.getFactorId());
+            row.createCell(2).setCellValue(priority.getFactorType() == null ? "" : priority.getFactorType());
+            row.createCell(3).setCellValue(priority.getOrderType() == null ? "" : priority.getOrderType());
+            if (priority.getSequence() == null) {
+                row.createCell(4).setCellValue("");
+            } else {
+                row.createCell(4).setCellValue(priority.getSequence());
+            }
+            row.createCell(5).setCellValue(priority.getDescription() == null ? "" : priority.getDescription());
+            row.createCell(6).setCellValue(scenarioId);
+
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

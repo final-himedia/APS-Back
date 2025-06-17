@@ -18,7 +18,7 @@ import java.util.List;
 public class OperationRoutingService {
     private final OperationRoutingRepository operationRoutingRepository;
 
-    public void excelHandle(MultipartFile file) throws IOException {
+    public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
         DataFormatter formatter = new DataFormatter();
@@ -27,24 +27,24 @@ public class OperationRoutingService {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
-            String siteId = row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0));
-            String routingId = row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1));
-            String operationId = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
-            String operationSeqStr = row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4));
-            int operationSeq = 0;
+            String siteId = formatter.formatCellValue(row.getCell(0));
+            String routingId = formatter.formatCellValue(row.getCell(1));
+            String operationId = formatter.formatCellValue(row.getCell(2));
+            String operationSeqStr = formatter.formatCellValue(row.getCell(4));
+            int operationSeq;
+
             try {
                 operationSeq = operationSeqStr.isEmpty() ? 0 : Integer.parseInt(operationSeqStr);
             } catch (NumberFormatException e) {
                 operationSeq = 0;
             }
-            String scenarioId = row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6));
 
             OperationRoutingId operationRoutingId = OperationRoutingId.builder()
                     .siteId(siteId)
                     .routingId(routingId)
                     .operationId(operationId)
                     .operationSeq(operationSeq)
-                    .scenarioId(scenarioId)
+                    .scenarioId(scenarioId) // 전달받은 파라미터 사용
                     .build();
 
             String operationName = row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3));
@@ -58,10 +58,12 @@ public class OperationRoutingService {
 
             operationRoutingRepository.save(operationRouting);
         }
+
         workbook.close();
     }
 
-    public void exportOperationRoutingExcel(HttpServletResponse response) throws IOException {
+
+    public void exportOperationRoutingExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<OperationRouting> operationRoutings = operationRoutingRepository.findAll();
 
         Workbook workbook = new XSSFWorkbook();

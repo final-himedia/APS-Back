@@ -2,10 +2,7 @@ package org.aps.engine.scenario.target.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.target.entity.Demand;
 import org.aps.engine.scenario.target.entity.DemandId;
@@ -25,36 +22,37 @@ public class DemandService {
     public void excelHandle(MultipartFile file, String scenarioId) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
+        DataFormatter formatter = new DataFormatter();
 
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
             DemandId demandId = DemandId.builder()
-                    .demandId(row.getCell(0) == null ? "" : row.getCell(0).getStringCellValue())
-                    .siteId(row.getCell(1) == null ? "" : row.getCell(1).getStringCellValue())
-                    .partId(row.getCell(2) == null ? "" : row.getCell(2).getStringCellValue())
+                    .demandId(formatter.formatCellValue(row.getCell(0)))
+                    .siteId(formatter.formatCellValue(row.getCell(1)))
+                    .partId(formatter.formatCellValue(row.getCell(2)))
                     .scenarioId(scenarioId)
                     .build();
 
             Demand demand = Demand.builder()
                     .demandId(demandId)
-                    .partName(row.getCell(3) == null ? "" : row.getCell(3).getStringCellValue())
-                    .customerId(row.getCell(4) == null ? "" : row.getCell(4).getStringCellValue())
-                    .dueDate(row.getCell(5) == null ? null : LocalDateTime.parse(row.getCell(5).getStringCellValue()))
-                    .demandQty(row.getCell(6) == null ? 0.0 : Double.valueOf(row.getCell(6).getStringCellValue()))
-                    .priority(row.getCell(7) == null ? 0.0f : (float) row.getCell(7).getNumericCellValue())
-                    .uom(row.getCell(8) == null ? "" : row.getCell(8).getStringCellValue())
-                    .orderType(row.getCell(9) == null ? "" : row.getCell(9).getStringCellValue())
-                    .orderTypeName(row.getCell(10) == null ? "" : row.getCell(10).getStringCellValue())
-                    .exceptYn(row.getCell(11) == null ? "" : row.getCell(11).getStringCellValue())
-                    .headerCreationDate(row.getCell(12) == null ? null : row.getCell(12).getLocalDateTimeCellValue())
-                    .hasOverActQty(row.getCell(13) != null && row.getCell(13).getBooleanCellValue())
+                    .partName(formatter.formatCellValue(row.getCell(3)))
+                    .customerId(formatter.formatCellValue(row.getCell(4)))
+                    .dueDate(LocalDateTime.parse(formatter.formatCellValue(row.getCell(5))))
+                    .demandQty(Double.valueOf(formatter.formatCellValue(row.getCell(6))))
+                    .priority(Float.valueOf(formatter.formatCellValue(row.getCell(7))))
+                    .uom(formatter.formatCellValue(row.getCell(8)))
+                    .orderType(formatter.formatCellValue(row.getCell(9)))
+                    .orderTypeName(formatter.formatCellValue(row.getCell(10)))
+                    .exceptYn(formatter.formatCellValue(row.getCell(11)))
+                    .headerCreationDate(LocalDateTime.parse(formatter.formatCellValue(row.getCell(12))))
+                    .hasOverActQty("true".equalsIgnoreCase(formatter.formatCellValue(row.getCell(13))))
                     .build();
-
 
             demandRepository.save(demand);
         }
     }
+
     public void exportDemandExcel(String scenarioId, HttpServletResponse response) throws IOException {
         List<Demand> demands = demandRepository.findAll();
 

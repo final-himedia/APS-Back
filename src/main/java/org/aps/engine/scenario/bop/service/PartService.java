@@ -91,7 +91,7 @@ public class PartService {
             row.createCell(5).setCellValue(part.getMinBatchSize());
             row.createCell(6).setCellValue(part.getMaxBatchSize());
             row.createCell(7).setCellValue(part.getUom() == null ? "" : part.getUom());
-            row.createCell(8).setCellValue(id.getScenarioId() == null ? "" : id.getScenarioId());
+            row.createCell(8).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

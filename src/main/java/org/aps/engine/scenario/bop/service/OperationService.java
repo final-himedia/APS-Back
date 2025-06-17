@@ -91,7 +91,7 @@ public class OperationService {
             row.createCell(9).setCellValue(operation.getOperationType() == null ? "" : operation.getOperationType());
             row.createCell(10).setCellValue(operation.getWaitTimeUom() == null ? "" : operation.getWaitTimeUom());
             row.createCell(11).setCellValue(operation.getTransferTimeUom() == null ? "" : operation.getTransferTimeUom());
-            row.createCell(12).setCellValue(id.getScenarioId() == null ? "" : id.getScenarioId());
+            row.createCell(12).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

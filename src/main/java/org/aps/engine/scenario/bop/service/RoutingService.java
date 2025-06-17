@@ -71,7 +71,7 @@ public class RoutingService {
             row.createCell(1).setCellValue(id.getRoutingId() == null ? "" : id.getRoutingId());
             row.createCell(2).setCellValue(routing.getRoutingName() == null ? "" : routing.getRoutingName());
             row.createCell(3).setCellValue(routing.getRoutingType() == null ? "" : routing.getRoutingType());
-            row.createCell(4).setCellValue(id.getScenarioId() == null ? "" : id.getScenarioId());
+            row.createCell(4).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

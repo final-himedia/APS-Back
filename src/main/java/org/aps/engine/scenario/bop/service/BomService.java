@@ -98,7 +98,7 @@ public class BomService {
             row.createCell(14).setCellValue(bom.getFromPartName() == null ? "" : bom.getFromPartName());
             row.createCell(15).setCellValue(bom.getBomText() == null ? "" : bom.getBomText());
             row.createCell(16).setCellValue(bom.getBomId().getZseq() == null ? "" : bom.getBomId().getZseq());
-            row.createCell(17).setCellValue(bom.getBomId().getScenarioId() == null ? "" : bom.getBomId().getScenarioId());
+            row.createCell(17).setCellValue(scenarioId);
             row.createCell(18).setCellValue(bom.getBomVersion() == null ? "" : bom.getBomVersion());
             row.createCell(19).setCellValue(bom.getFromPartLevel() == null ? "" : bom.getFromPartLevel());
             row.createCell(20).setCellValue(bom.getToPartLevel() == null ? "" : bom.getToPartLevel());

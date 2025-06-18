@@ -216,7 +216,7 @@ public class ManagementController {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(results);
+        return ResponseEntity.status(200).body(results);
     }
 
     // 작성자로 게시글 검색
@@ -228,7 +228,7 @@ public class ManagementController {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(results);
+        return ResponseEntity.status(200).body(results);
     }
 
     // 댓글 목록 조회

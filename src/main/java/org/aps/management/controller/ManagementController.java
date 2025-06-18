@@ -207,15 +207,28 @@ public class ManagementController {
         return ResponseEntity.status(204).build();
     }
 
-    // 게시글 검색
-    @GetMapping("/qna/search")
-    public ResponseEntity<List<Qna>> searchQna(@RequestParam String title) {
-        List<Qna> results = qnaRepository.findByTitleAndDeletedFalse(title);
+    // 제목으로 게시글 검색
+    @GetMapping("/qna/search/title")
+    public ResponseEntity<List<Qna>> searchByTitle(@RequestParam String title) {
+        List<Qna> results = qnaRepository.findByTitleContainingAndDeletedFalse(title);
+
         if (results.isEmpty()) {
-            return ResponseEntity.status(204).build();
+            return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.status(200).body(results);
+        return ResponseEntity.ok(results);
+    }
+
+    // 작성자로 게시글 검색
+    @GetMapping("/qna/search/writer")
+    public ResponseEntity<List<Qna>> searchByWriter(@RequestParam Long writerId) {
+        List<Qna> results = qnaRepository.findByWriterIdAndDeletedFalse(writerId);
+
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(results);
     }
 
     // 댓글 목록 조회

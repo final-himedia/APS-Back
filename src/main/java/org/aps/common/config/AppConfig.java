@@ -29,9 +29,10 @@ public class AppConfig implements WebMvcConfigurer {
                         "/api/auth/login",
                         "/api/auth/signup",
                         "/api/auth/find-password",
+
                         "/api/management/qna",            // 게시글 목록 조회
-                        "/api/management/qna/search",     // 게시글 검색
-                        "/api/management/qna/*",          // 상세 조회
+                        "/api/management/qna/*",          // 게시글 상세 조회
+                        "/api/management/qna/search/**",  // 게시글 검색
                         "/api/management/qna/*/comment"   // 댓글 목록
                 );
     }

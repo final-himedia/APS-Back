@@ -8,6 +8,8 @@ import org.aps.management.entity.Comment;
 import org.aps.management.entity.Qna;
 import org.aps.management.repository.CommentRepository;
 import org.aps.management.repository.QnaRepository;
+import org.aps.management.response.CommentResponse;
+import org.aps.management.response.QnaResponse;
 import org.aps.management.response.UserListResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -121,25 +123,55 @@ public class ManagementController {
     }
 
     // 전체 게시글 목록 조회
-    @GetMapping("/qna")
-    public ResponseEntity<List<Qna>> allQnas() {
+    @GetMapping("/qna/list")
+    public ResponseEntity<List<QnaResponse>> allQnas() {
         List<Qna> qnas = qnaRepository.findByDeletedFalse();
-        return ResponseEntity.status(200).body(qnas);
+        List<QnaResponse> results = new ArrayList<>();
+
+        for (Qna qna : qnas) {
+            User writer = userRepository.findById(qna.getWriterId()).orElse(null);
+
+            QnaResponse response = QnaResponse.builder()
+                    .id(qna.getId())
+                    .title(qna.getTitle())
+                    .content(qna.getContent())
+                    .wroteAt(qna.getWroteAt())
+                    .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                    .build();
+
+            results.add(response);
+        }
+
+        return ResponseEntity.status(200).body(results);
     }
 
     // 게시글 상세 조회
-    @GetMapping("/qna/{id}")
-    public ResponseEntity<Qna> detailQna(@PathVariable Integer id) {
+    @GetMapping("/qna/detail/{id}")
+    public ResponseEntity<QnaResponse> detailQna(@PathVariable Integer id) {
         Qna qna = qnaRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."));
 
-        return ResponseEntity.status(200).body(qna);
+        User writer = userRepository.findById(qna.getWriterId()).orElse(null);
+
+        QnaResponse response = QnaResponse.builder()
+                .id(qna.getId())
+                .title(qna.getTitle())
+                .content(qna.getContent())
+                .wroteAt(qna.getWroteAt())
+                .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                .build();
+
+        return ResponseEntity.status(200).body(response);
     }
 
     // 게시글 등록
     @PostMapping("/qna")
     public ResponseEntity<Qna> createQna(@RequestBody Qna request, HttpServletRequest httpRequest) {
         User loginUser = (User) httpRequest.getAttribute("user");
+
+        if (loginUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
 
         // 새 게시글 생성
         Qna newQna = Qna.builder()
@@ -209,45 +241,96 @@ public class ManagementController {
 
     // 제목으로 게시글 검색
     @GetMapping("/qna/search/title")
-    public ResponseEntity<List<Qna>> searchByTitle(@RequestParam String title) {
+    public ResponseEntity<List<QnaResponse>> searchByTitle(@RequestParam String title) {
         List<Qna> results = qnaRepository.findByTitleContainingAndDeletedFalse(title);
 
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.status(200).body(results);
+        List<QnaResponse> responseList = new ArrayList<>();
+        for (Qna qna : results) {
+            User writer = userRepository.findById(qna.getWriterId()).orElse(null);
+
+            QnaResponse response = QnaResponse.builder()
+                    .id(qna.getId())
+                    .title(qna.getTitle())
+                    .content(qna.getContent())
+                    .wroteAt(qna.getWroteAt())
+                    .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                    .build();
+
+            responseList.add(response);
+        }
+
+        return ResponseEntity.status(200).body(responseList);
     }
 
     // 작성자로 게시글 검색
     @GetMapping("/qna/search/writer")
-    public ResponseEntity<List<Qna>> searchByWriter(@RequestParam Long writerId) {
-        List<Qna> results = qnaRepository.findByWriterIdAndDeletedFalse(writerId);
+    public ResponseEntity<List<QnaResponse>> searchByWriter(@RequestParam String email) {
+        User writer = userRepository.findByEmail(email);
+
+        if (writer == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        List<Qna> results = qnaRepository.findByWriterIdAndDeletedFalse(writer.getId());
 
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.status(200).body(results);
+        List<QnaResponse> responseList = new ArrayList<>();
+        for (Qna qna : results) {
+            QnaResponse response = QnaResponse.builder()
+                    .id(qna.getId())
+                    .title(qna.getTitle())
+                    .content(qna.getContent())
+                    .wroteAt(qna.getWroteAt())
+                    .email(writer.getEmail())
+                    .build();
+            responseList.add(response);
+        }
+
+        return ResponseEntity.status(200).body(responseList);
     }
 
     // 댓글 목록 조회
-    @GetMapping("/qna/{qnaId}/comment")
-    public ResponseEntity<List<Comment>> getComments(@PathVariable Integer qnaId) {
+    @GetMapping("/qna/{qnaId}/comment/list")
+    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Integer qnaId) {
         List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalse(qnaId);
-        return ResponseEntity.status(200).body(comments);
+        List<CommentResponse> results = new ArrayList<>();
+
+        for (Comment comment : comments) {
+            User writer = userRepository.findById(comment.getWriterId()).orElse(null);
+
+            CommentResponse response = CommentResponse.builder()
+                    .id(comment.getId())
+                    .content(comment.getContent())
+                    .wroteAt(comment.getWroteAt())
+                    .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                    .build();
+
+            results.add(response);
+        }
+
+        return ResponseEntity.status(200).body(results);
     }
+
 
     // 댓글 등록
     @PostMapping("/qna/{qnaId}/comment")
-    public ResponseEntity<Comment> createComment(@PathVariable Integer qnaId,
-                                                 @RequestBody Comment request,
-                                                 HttpServletRequest httpRequest) {
-
+    public ResponseEntity<CommentResponse> createComment(@PathVariable Integer qnaId,
+                                                         @RequestBody Comment request,
+                                                         HttpServletRequest httpRequest) {
         Qna qna = qnaRepository.findByIdAndDeletedFalse(qnaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."));
 
         User loginUser = (User) httpRequest.getAttribute("user");
+        if (loginUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
 
         Comment comment = Comment.builder()
                 .qnaId(qnaId)
@@ -258,7 +341,15 @@ public class ManagementController {
                 .build();
 
         Comment saved = commentRepository.save(comment);
-        return ResponseEntity.status(201).body(saved);
+
+        CommentResponse response = CommentResponse.builder()
+                .id(saved.getId())
+                .content(saved.getContent())
+                .wroteAt(saved.getWroteAt())
+                .email(loginUser.getEmail())
+                .build();
+
+        return ResponseEntity.status(201).body(response);
     }
 
     // 댓글 수정
@@ -269,6 +360,10 @@ public class ManagementController {
                                                  HttpServletRequest httpRequest) {
         User loginUser = (User) httpRequest.getAttribute("user");
 
+        if (loginUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+
         Comment comment = commentRepository.findByIdAndQnaIdAndDeletedFalse(commentId, qnaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
 
@@ -277,6 +372,16 @@ public class ManagementController {
         }
 
         comment.setContent(request.getContent());
+
+        Comment updated = commentRepository.save(comment);
+
+        CommentResponse response = CommentResponse.builder()
+                .id(updated.getId())
+                .content(updated.getContent())
+                .wroteAt(updated.getWroteAt())
+                .email(loginUser.getEmail())
+                .build();
+
         return ResponseEntity.status(200).body(commentRepository.save(comment));
     }
 
@@ -286,6 +391,10 @@ public class ManagementController {
                                               @PathVariable Integer commentId,
                                               HttpServletRequest httpRequest) {
         User loginUser = (User) httpRequest.getAttribute("user");
+
+        if (loginUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
 
         Comment comment = commentRepository.findByIdAndQnaIdAndDeletedFalse(commentId, qnaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));

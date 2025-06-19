@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository("bopOperationRoutingRepository")
 public interface OperationRoutingRepository extends JpaRepository<OperationRouting, OperationRoutingId> {
-    List<OperationRouting> findByOperationRoutingIdScenarioId(String scenarioId);
+//    List<OperationRouting> findByOperationRoutingIdScenarioId(String scenarioId);
 
 }

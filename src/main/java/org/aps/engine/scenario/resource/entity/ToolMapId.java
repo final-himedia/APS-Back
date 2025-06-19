@@ -12,8 +12,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ToolMapId implements Serializable {
-    private String partId;
-    private String scenarioId;
-    private String toolId;
 
+    private String partId;
 }
+
+
+
+
+
+
+

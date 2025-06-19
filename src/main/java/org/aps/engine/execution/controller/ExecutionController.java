@@ -17,6 +17,6 @@ public class ExecutionController {
     @GetMapping
     public ResponseEntity<?> executionTest(@RequestParam("scenarioId")String s){
        executionResultService.simulateSchedule(s);
-       return ResponseEntity.ok(null);
+       return ResponseEntity.ok(s);
     }
 }

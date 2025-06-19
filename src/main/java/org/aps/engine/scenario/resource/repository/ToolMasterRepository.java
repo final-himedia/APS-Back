@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository("resourceToolMasterRepository")
 public interface ToolMasterRepository extends JpaRepository<ToolMaster, String> {
-    List<ToolMaster> findByToolMasterIdScenarioId(String scenarioId);
+//    List<ToolMaster> findByToolMasterIdScenarioId(String scenarioId);
 
 
 }

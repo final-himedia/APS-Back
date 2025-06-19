@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Builder
 public class ExecutionResponse {
-        private String operationSiteId;
         private String operationId;
         private String operationName;
         private String runTime;
@@ -19,16 +18,7 @@ public class ExecutionResponse {
         private String routingId;
         private String partName;
 
-        private String orSiteId;
-        private String orRoutingId;
-        private String orOperationId;
-        private String orOperationName;
-        private Integer orOperationSeq;
-        private String orOperationType;
-
         private String scenarioId;
-
-
     }
 
 

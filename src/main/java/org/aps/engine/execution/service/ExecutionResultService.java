@@ -1,112 +1,107 @@
 package org.aps.engine.execution.service;
 
 import lombok.RequiredArgsConstructor;
-import org.aps.engine.execution.response.ExecutionResponse;
-import org.aps.engine.execution.result.ExecutionResult;
+import org.aps.engine.execution.repository.WorkcenterPlanRepository;
+import org.aps.engine.execution.result.WorkcenterPlan;
+import org.aps.engine.scenario.bop.entity.Operation;
+import org.aps.engine.scenario.bop.entity.OperationRouting;
 import org.aps.engine.scenario.bop.repository.OperationRepository;
 import org.aps.engine.scenario.bop.repository.OperationRoutingRepository;
-import org.aps.engine.scenario.resource.entity.WorkCenter;
+import org.aps.engine.scenario.resource.entity.*;
+import org.aps.engine.scenario.resource.repository.ToolMapRepository;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
+import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ExecutionResultService {
 
     private final OperationRepository operationRepository;
-    private final OperationRoutingRepository operationRoutingRepository;
     private final ToolMasterRepository toolRepository;
     private final WorkCenterRepository workcenterRepository;
+    private final WorkcenterPlanRepository workcenterPlanRepository;
+    private final OperationRoutingRepository bopOperationRoutingRepository;
+    private final ToolMapRepository resourceToolMapRepository;
+    private final WorkCenterMapRepository resourceWorkCenterMapRepository;
+    private final ToolMasterRepository resourceToolMasterRepository;
 
-    public List<ExecutionResult> simulateSchedule(String scenarioId) {
-        List<ExecutionResponse> operations = operationRepository.findByScenarioId(scenarioId);
+    public List<WorkcenterPlan> simulateSchedule(String scenarioId) {
+        List<OperationRouting> operationRoutings = bopOperationRoutingRepository.findAll();
 
-        LocalDateTime baseStartTime = LocalDateTime.of(2025, 6, 4, 9, 0);
+        Map<ToolMaster, LocalDateTime> toolAvailableTime = new HashMap<>();
+        resourceToolMasterRepository.findAll().forEach(tool -> {
+            toolAvailableTime.put(tool, LocalDateTime.of(2025, 6, 4, 9, 0));
+        });
 
-        Map<String, LocalDateTime> toolAvailableTime = new HashMap<>();
-        toolRepository.findAll().forEach(tool ->
-                toolAvailableTime.put(tool.getToolMasterId().getToolId(), baseStartTime)
-        );
+        Map<WorkCenter, LocalDateTime> workcenterAvailableTime = new HashMap<>();
+        workcenterRepository.findAll().forEach(workCenter -> {
+            workcenterAvailableTime.put(workCenter, LocalDateTime.of(2025, 6, 4, 9, 0));
+        });
 
-        Map<String, LocalDateTime> workcenterAvailableTime = new HashMap<>();
-        workcenterRepository.findAll().forEach(wc ->
-                workcenterAvailableTime.put(wc.getWorkCenterId().getWorkcenterId(), baseStartTime)
-        );
+        List<WorkcenterPlan> resultPlans = new ArrayList<>();
 
-        List<ExecutionResult> results = new ArrayList<>();
+        for (OperationRouting operationRouting : operationRoutings) {
+            Operation task = operationRouting.getOperation();
 
-        for (ExecutionResponse op : operations) {
-            List<WorkCenter> candidateWorkcenters = workcenterRepository.findByWorkCenterIdScenarioId(op.getOperationId());
+            // 최적의 Tool 선택
+            ToolMaster selectedTool = toolAvailableTime.entrySet().stream()
+                    .min(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
 
-            if (candidateWorkcenters == null || candidateWorkcenters.isEmpty()) {
-                // 스킵하거나 로그 처리
-                continue;
-            }
+            if (selectedTool == null) continue;
 
+            // 해당 Operation에 가능한 Workcenter 목록 중 가용 시간이 가장 빠른 것 선택
+            List<WorkCenterMap> workCenterMaps = resourceWorkCenterMapRepository.findByOperation(task);
             WorkCenter selectedWorkcenter = null;
-            LocalDateTime earliestWcTime = null;
+            WorkCenterMap selectedWorkcenterMap = null;
 
-            for (WorkCenter wc : candidateWorkcenters) {
-                LocalDateTime wcTime = workcenterAvailableTime.getOrDefault(wc.getWorkCenterId().getWorkcenterId(), baseStartTime);
-                if (earliestWcTime == null || wcTime.isBefore(earliestWcTime)) {
+            for (WorkCenterMap map : workCenterMaps) {
+                WorkCenter wc = map.getWorkCenter();
+                if (selectedWorkcenter == null || workcenterAvailableTime.get(wc).isBefore(workcenterAvailableTime.get(selectedWorkcenter))) {
                     selectedWorkcenter = wc;
-                    earliestWcTime = wcTime;
+                    selectedWorkcenterMap = map;
                 }
             }
 
-            String selectedToolId = null;
-            LocalDateTime earliestToolTime = null;
+            if (selectedWorkcenter == null || selectedWorkcenterMap == null) continue;
 
-            for (Map.Entry<String, LocalDateTime> entry : toolAvailableTime.entrySet()) {
-                String toolId = entry.getKey();
-                LocalDateTime toolTime = entry.getValue();
-                if (earliestToolTime == null || toolTime.isBefore(earliestToolTime)) {
-                    selectedToolId = toolId;
-                    earliestToolTime = toolTime;
-                }
-            }
+            LocalDateTime toolAvailable = toolAvailableTime.get(selectedTool);
+            LocalDateTime workcenterAvailable = workcenterAvailableTime.get(selectedWorkcenter);
+            LocalDateTime startTime = toolAvailable.isAfter(workcenterAvailable) ? toolAvailable : workcenterAvailable;
 
-            if (earliestToolTime == null || earliestWcTime == null || selectedWorkcenter == null || selectedToolId == null) {
-                // 잘못된 매핑이 있는 경우 스킵
-                continue;
-            }
+            // ⬇️ tactTime을 시간 단위로 해석하여 endTime 계산
+            double tactTime = Double.parseDouble(selectedWorkcenterMap.getTactTime());
+            long tactHours = Math.round(tactTime);
+            LocalDateTime endTime = startTime.plusHours(tactHours);
 
-            LocalDateTime startTime = earliestToolTime.isAfter(earliestWcTime) ? earliestToolTime : earliestWcTime;
+            // 자원 사용 시간 업데이트
+            toolAvailableTime.put(selectedTool, endTime);
+            workcenterAvailableTime.put(selectedWorkcenter, endTime);
 
-            int runTimeMinutes;
-            try {
-                runTimeMinutes = Integer.parseInt(op.getRunTime());
-            } catch (NumberFormatException e) {
-                runTimeMinutes = 10; // 기본값 or continue;
-            }
+            // 계획 저장
+            WorkcenterPlan plan = WorkcenterPlan.builder()
+                    .workcenterId(selectedWorkcenter.getWorkCenterId().getWorkcenterId())
+                    .workcenterGroup(selectedWorkcenter.getWorkcenterGroup())
+                    .workcenterName(selectedWorkcenter.getWorkcenterName())
+                    .scenarioId(scenarioId)
+                    .workcenterStartTime(startTime)
+                    .workcenterEndTime(endTime)
+                    .operationId(task.getOperationId().getOperationId())
+                    .operationName(task.getOperationName())
+                    .operationType(task.getOperationType())
+                    .build();
 
-            LocalDateTime endTime = startTime.plusMinutes(runTimeMinutes);
-
-            toolAvailableTime.put(selectedToolId, endTime);
-            workcenterAvailableTime.put(selectedWorkcenter.getWorkCenterId().getWorkcenterId(), endTime);
-
-            ExecutionResult dto = new ExecutionResult();
-            dto.setScenarioId(scenarioId);
-            dto.setOperationId(op.getOperationId());
-            dto.setOperationName(op.getOperationName());
-            dto.setWorkcenterId(selectedWorkcenter.getWorkCenterId().getWorkcenterId());
-            dto.setWorkcenterName(selectedWorkcenter.getWorkcenterName());
-            dto.setWorkcenterStartTime((int) java.time.Duration.between(baseStartTime, startTime).toMinutes());
-            dto.setWorkcenterEndTime(endTime);
-            dto.setProcessQty(op.getOrOperationSeq());
-            dto.setToolDetail1(selectedToolId);
-            // 필요 시 추가 필드 설정
-
-            results.add(dto);
+            resultPlans.add(plan);
         }
 
-        return results;
+        workcenterPlanRepository.saveAll(resultPlans);
+
+        return resultPlans;
     }
 }

@@ -29,13 +29,7 @@ public class AppConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/auth/login",
                         "/api/auth/signup",
-                        "/api/auth/find-password",
-
-                        "/api/management/qna/list",      // 게시글 목록 조회
-                        "/api/management/qna/detail/**", // 게시글 상세 조회
-                        "/api/management/qna/search/**", // 게시글 검색
-                        "/api/management/qna/*/comment/list", // 댓글 목록 조회
-                        "/api/scenarios/list"            // 시나리오 목록 조회
+                        "/api/auth/find-password"
                 );
     }
 }

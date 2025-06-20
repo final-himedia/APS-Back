@@ -13,4 +13,5 @@ public class CommentResponse {
     private String content;
     private LocalDateTime wroteAt;
     private String email;
+    private String name;
 }

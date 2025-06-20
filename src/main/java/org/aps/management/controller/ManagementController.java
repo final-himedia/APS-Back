@@ -133,10 +133,12 @@ public class ManagementController {
 
             QnaResponse response = QnaResponse.builder()
                     .id(qna.getId())
+                    .writerId(qna.getWriterId())
                     .title(qna.getTitle())
                     .content(qna.getContent())
                     .wroteAt(qna.getWroteAt())
-                    .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                    .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
+                    .name(writer != null ? writer.getName() : "이름 없음")
                     .build();
 
             results.add(response);
@@ -155,10 +157,12 @@ public class ManagementController {
 
         QnaResponse response = QnaResponse.builder()
                 .id(qna.getId())
+                .writerId(qna.getWriterId())
                 .title(qna.getTitle())
                 .content(qna.getContent())
                 .wroteAt(qna.getWroteAt())
-                .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
+                .name(writer != null ? writer.getName() : "이름 없음")
                 .build();
 
         return ResponseEntity.status(200).body(response);
@@ -243,24 +247,20 @@ public class ManagementController {
     @GetMapping("/qna/search/title")
     public ResponseEntity<List<QnaResponse>> searchByTitle(@RequestParam String title) {
         List<Qna> results = qnaRepository.findByTitleContainingAndDeletedFalse(title);
-
-        if (results.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (results.isEmpty()) return ResponseEntity.noContent().build();
 
         List<QnaResponse> responseList = new ArrayList<>();
         for (Qna qna : results) {
             User writer = userRepository.findById(qna.getWriterId()).orElse(null);
-
-            QnaResponse response = QnaResponse.builder()
+            responseList.add(QnaResponse.builder()
                     .id(qna.getId())
+                    .writerId(qna.getWriterId())
                     .title(qna.getTitle())
                     .content(qna.getContent())
                     .wroteAt(qna.getWroteAt())
-                    .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
-                    .build();
-
-            responseList.add(response);
+                    .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
+                    .name(writer != null ? writer.getName() : "이름 없음")
+                    .build());
         }
 
         return ResponseEntity.status(200).body(responseList);
@@ -268,32 +268,27 @@ public class ManagementController {
 
     // 작성자로 게시글 검색
     @GetMapping("/qna/search/writer")
-    public ResponseEntity<List<QnaResponse>> searchByWriter(@RequestParam String email) {
-        User writer = userRepository.findByEmail(email);
-
-        if (writer == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<List<QnaResponse>> searchByWriterName(@RequestParam String name) {
+        User writer = userRepository.findByName(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
 
         List<Qna> results = qnaRepository.findByWriterIdAndDeletedFalse(writer.getId());
-
-        if (results.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+        if (results.isEmpty()) return ResponseEntity.noContent().build();
 
         List<QnaResponse> responseList = new ArrayList<>();
         for (Qna qna : results) {
-            QnaResponse response = QnaResponse.builder()
+            responseList.add(QnaResponse.builder()
                     .id(qna.getId())
+                    .writerId(qna.getWriterId())
                     .title(qna.getTitle())
                     .content(qna.getContent())
                     .wroteAt(qna.getWroteAt())
                     .email(writer.getEmail())
-                    .build();
-            responseList.add(response);
+                    .name(writer.getName())
+                    .build());
         }
 
-        return ResponseEntity.status(200).body(responseList);
+        return ResponseEntity.ok(responseList);
     }
 
     // 댓글 목록 조회
@@ -309,7 +304,8 @@ public class ManagementController {
                     .id(comment.getId())
                     .content(comment.getContent())
                     .wroteAt(comment.getWroteAt())
-                    .email(writer != null ? writer.getEmail() : "탈퇴한 사용자")
+                    .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
+                    .name(writer != null ? writer.getName() : "이름 없음")
                     .build();
 
             results.add(response);
@@ -347,6 +343,7 @@ public class ManagementController {
                 .content(saved.getContent())
                 .wroteAt(saved.getWroteAt())
                 .email(loginUser.getEmail())
+                .name(loginUser.getName())
                 .build();
 
         return ResponseEntity.status(201).body(response);
@@ -354,7 +351,7 @@ public class ManagementController {
 
     // 댓글 수정
     @PutMapping("/qna/{qnaId}/comment/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Integer qnaId,
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable Integer qnaId,
                                                  @PathVariable Integer commentId,
                                                  @RequestBody Comment request,
                                                  HttpServletRequest httpRequest) {
@@ -372,7 +369,6 @@ public class ManagementController {
         }
 
         comment.setContent(request.getContent());
-
         Comment updated = commentRepository.save(comment);
 
         CommentResponse response = CommentResponse.builder()
@@ -380,9 +376,10 @@ public class ManagementController {
                 .content(updated.getContent())
                 .wroteAt(updated.getWroteAt())
                 .email(loginUser.getEmail())
+                .name(loginUser.getName())
                 .build();
 
-        return ResponseEntity.status(200).body(commentRepository.save(comment));
+        return ResponseEntity.status(200).body(response);
     }
 
     // 댓글 삭제

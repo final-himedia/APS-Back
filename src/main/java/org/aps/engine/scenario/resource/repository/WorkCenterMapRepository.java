@@ -1,7 +1,5 @@
 package org.aps.engine.scenario.resource.repository;
 
-import org.aps.engine.scenario.bop.entity.Operation;
-import org.aps.engine.scenario.resource.entity.ToolMap;
 import org.aps.engine.scenario.resource.entity.WorkCenterMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,5 +10,6 @@ import java.util.List;
 public interface WorkCenterMapRepository extends JpaRepository<WorkCenterMap, String> {
 //    List<WorkCenterMap> findByWorkCenterMapIdScenarioId(String scenarioId);
 
-    List<WorkCenterMap> findByOperation(Operation task);
+
+    List<WorkCenterMap> findByRoutingId(String routingId);
 }

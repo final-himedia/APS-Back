@@ -2,13 +2,12 @@ package org.aps.engine.execution.service;
 
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
+import org.aps.engine.execution.response.ExecutionResponse;
 import org.aps.engine.execution.result.WorkcenterPlan;
-import org.aps.engine.scenario.bop.entity.Operation;
-import org.aps.engine.scenario.bop.entity.OperationRouting;
-import org.aps.engine.scenario.bop.repository.OperationRepository;
-import org.aps.engine.scenario.bop.repository.OperationRoutingRepository;
-import org.aps.engine.scenario.resource.entity.*;
-import org.aps.engine.scenario.resource.repository.ToolMapRepository;
+import org.aps.engine.scenario.bop.repository.OperationRouteRepository;
+import org.aps.engine.scenario.resource.entity.ToolMaster;
+import org.aps.engine.scenario.resource.entity.WorkCenter;
+import org.aps.engine.scenario.resource.entity.WorkCenterMap;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
@@ -21,87 +20,94 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ExecutionResultService {
 
-    private final OperationRepository operationRepository;
-    private final ToolMasterRepository toolRepository;
     private final WorkCenterRepository workcenterRepository;
     private final WorkcenterPlanRepository workcenterPlanRepository;
-    private final OperationRoutingRepository bopOperationRoutingRepository;
-    private final ToolMapRepository resourceToolMapRepository;
-    private final WorkCenterMapRepository resourceWorkCenterMapRepository;
-    private final ToolMasterRepository resourceToolMasterRepository;
+    private final OperationRouteRepository operationRouteRepository;
+    private final WorkCenterMapRepository workCenterMapRepository;
+    private final ToolMasterRepository toolMasterRepository;
+
+    private static final LocalDateTime START_TIME = LocalDateTime.of(2025, 6, 4, 9, 0);
 
     public List<WorkcenterPlan> simulateSchedule(String scenarioId) {
-        List<OperationRouting> operationRoutings = bopOperationRoutingRepository.findAll();
+        System.out.println("===== 시뮬레이션 시작 =====");
 
-        Map<ToolMaster, LocalDateTime> toolAvailableTime = new HashMap<>();
-        resourceToolMasterRepository.findAll().forEach(tool -> {
-            toolAvailableTime.put(tool, LocalDateTime.of(2025, 6, 4, 9, 0));
-        });
+        Map<ToolMaster, LocalDateTime> toolAvailability = initToolAvailability();
+        Map<WorkCenter, LocalDateTime> wcAvailability = initWorkcenterAvailability();
 
-        Map<WorkCenter, LocalDateTime> workcenterAvailableTime = new HashMap<>();
-        workcenterRepository.findAll().forEach(workCenter -> {
-            workcenterAvailableTime.put(workCenter, LocalDateTime.of(2025, 6, 4, 9, 0));
-        });
+        System.out.println("총 Tool 수: " + toolAvailability.size());
+        System.out.println("총 WorkCenter 수: " + wcAvailability.size());
 
+        List<ExecutionResponse> routes = operationRouteRepository.findByScenarioIdWithPart(scenarioId);
         List<WorkcenterPlan> resultPlans = new ArrayList<>();
 
-        for (OperationRouting operationRouting : operationRoutings) {
-            Operation task = operationRouting.getOperation();
-
-            // 최적의 Tool 선택
-            ToolMaster selectedTool = toolAvailableTime.entrySet().stream()
-                    .min(Map.Entry.comparingByValue())
-                    .map(Map.Entry::getKey)
-                    .orElse(null);
-
+        for (ExecutionResponse route : routes) {
+            ToolMaster selectedTool = getEarliestAvailable(toolAvailability);
             if (selectedTool == null) continue;
 
-            // 해당 Operation에 가능한 Workcenter 목록 중 가용 시간이 가장 빠른 것 선택
-            List<WorkCenterMap> workCenterMaps = resourceWorkCenterMapRepository.findByOperation(task);
-            WorkCenter selectedWorkcenter = null;
-            WorkCenterMap selectedWorkcenterMap = null;
+            // WorkCenter 선택
+            WorkCenterMap selectedWCMap = getEarliestWorkcenter(
+                    workCenterMapRepository.findByRoutingId(route.getRoutingId()),
+                    wcAvailability
+            );
+            if (selectedWCMap == null) continue;
 
-            for (WorkCenterMap map : workCenterMaps) {
-                WorkCenter wc = map.getWorkCenter();
-                if (selectedWorkcenter == null || workcenterAvailableTime.get(wc).isBefore(workcenterAvailableTime.get(selectedWorkcenter))) {
-                    selectedWorkcenter = wc;
-                    selectedWorkcenterMap = map;
-                }
-            }
+            WorkCenter selectedWC = selectedWCMap.getWorkCenter();
 
-            if (selectedWorkcenter == null || selectedWorkcenterMap == null) continue;
+            LocalDateTime startTime = Collections.max(List.of(
+                    toolAvailability.get(selectedTool),
+                    wcAvailability.get(selectedWC)));
 
-            LocalDateTime toolAvailable = toolAvailableTime.get(selectedTool);
-            LocalDateTime workcenterAvailable = workcenterAvailableTime.get(selectedWorkcenter);
-            LocalDateTime startTime = toolAvailable.isAfter(workcenterAvailable) ? toolAvailable : workcenterAvailable;
+            double tact = Double.parseDouble(selectedWCMap.getTactTime());
+            LocalDateTime endTime = startTime.plusHours(Math.round(tact));
 
-            // ⬇️ tactTime을 시간 단위로 해석하여 endTime 계산
-            double tactTime = Double.parseDouble(selectedWorkcenterMap.getTactTime());
-            long tactHours = Math.round(tactTime);
-            LocalDateTime endTime = startTime.plusHours(tactHours);
+            toolAvailability.put(selectedTool, endTime);
+            wcAvailability.put(selectedWC, endTime);
 
-            // 자원 사용 시간 업데이트
-            toolAvailableTime.put(selectedTool, endTime);
-            workcenterAvailableTime.put(selectedWorkcenter, endTime);
-
-            // 계획 저장
             WorkcenterPlan plan = WorkcenterPlan.builder()
-                    .workcenterId(selectedWorkcenter.getWorkCenterId().getWorkcenterId())
-                    .workcenterGroup(selectedWorkcenter.getWorkcenterGroup())
-                    .workcenterName(selectedWorkcenter.getWorkcenterName())
                     .scenarioId(scenarioId)
+                    .workcenterId(selectedWC.getWorkCenterId().getWorkcenterId())
+                    .workcenterGroup(selectedWC.getWorkcenterGroup())
+                    .workcenterName(selectedWC.getWorkcenterName())
                     .workcenterStartTime(startTime)
                     .workcenterEndTime(endTime)
-                    .operationId(task.getOperationId().getOperationId())
-                    .operationName(task.getOperationName())
-                    .operationType(task.getOperationType())
+                    .operationId(route.getOperationId())
+                    .operationName(route.getOperationName())
+                    .operationType("N/A") // 필요시 route에서 가져오도록 추가
                     .build();
 
             resultPlans.add(plan);
         }
 
         workcenterPlanRepository.saveAll(resultPlans);
-
         return resultPlans;
+    }
+
+    private Map<ToolMaster, LocalDateTime> initToolAvailability() {
+        Map<ToolMaster, LocalDateTime> map = new HashMap<>();
+        for (ToolMaster tool : toolMasterRepository.findAll()) {
+            map.put(tool, START_TIME);
+        }
+        return map;
+    }
+
+    private Map<WorkCenter, LocalDateTime> initWorkcenterAvailability() {
+        Map<WorkCenter, LocalDateTime> map = new HashMap<>();
+        for (WorkCenter wc : workcenterRepository.findAll()) {
+            map.put(wc, START_TIME);
+        }
+        return map;
+    }
+
+    private ToolMaster getEarliestAvailable(Map<ToolMaster, LocalDateTime> availabilityMap) {
+        return availabilityMap.entrySet().stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    private WorkCenterMap getEarliestWorkcenter(List<WorkCenterMap> wcMaps, Map<WorkCenter, LocalDateTime> wcAvailability) {
+        return wcMaps.stream()
+                .min(Comparator.comparing(map -> wcAvailability.get(map.getWorkCenter())))
+                .orElse(null);
     }
 }

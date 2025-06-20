@@ -2,7 +2,7 @@ package org.aps.engine.scenario.resource.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.aps.engine.scenario.bop.entity.Operation;
+import org.aps.engine.scenario.bop.entity.OperationRoute;
 
 @Entity
 @Setter
@@ -31,10 +31,12 @@ public class WorkCenterMap {
     private WorkCenter workCenter;
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "scenario_id", referencedColumnName = "scenarioId", insertable = false, updatable = false),
-            @JoinColumn(name = "operation_id", referencedColumnName = "operationId", insertable = false, updatable = false)
+            @JoinColumn(name = "site_id", referencedColumnName = "siteId", insertable = false, updatable = false),
+            @JoinColumn(name = "operation_id", referencedColumnName = "operationId", insertable = false, updatable = false),
+            @JoinColumn(name = "scenario_id", referencedColumnName = "scenarioId", insertable = false, updatable = false)
     })
-    private Operation operation;
+    private OperationRoute operationRoute;
+
 
 
 }

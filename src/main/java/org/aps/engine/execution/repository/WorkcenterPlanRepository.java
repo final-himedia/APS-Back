@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface WorkcenterPlanRepository extends JpaRepository<WorkcenterPlan, Integer > {
-    Optional<WorkcenterPlan> findByScenarioIdAndOperationIdAndWorkcenterId(String scenarioId, String operationId, String workcenterId);
 
 }

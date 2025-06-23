@@ -25,4 +25,6 @@ public class WorkcenterPlan {
     private String operationId;
     private String operationName;
     private String operationType;
+    private String toolId;
+    private String toolName;
 }

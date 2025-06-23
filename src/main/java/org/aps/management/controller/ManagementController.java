@@ -125,7 +125,7 @@ public class ManagementController {
     // 전체 게시글 목록 조회
     @GetMapping("/qna/list")
     public ResponseEntity<List<QnaResponse>> allQnas() {
-        List<Qna> qnas = qnaRepository.findByDeletedFalse();
+        List<Qna> qnas = qnaRepository.findByDeletedFalseOrderByWroteAtDesc();
         List<QnaResponse> results = new ArrayList<>();
 
         for (Qna qna : qnas) {
@@ -233,7 +233,7 @@ public class ManagementController {
         qnaRepository.save(qna);
 
         // 게시글 및 댓글 삭제
-        List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalse(id);
+        List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalseOrderByWroteAtDesc(id);
         for (Comment comment : comments) {
             comment.setDeleted(true);
         }
@@ -294,7 +294,7 @@ public class ManagementController {
     // 댓글 목록 조회
     @GetMapping("/qna/{qnaId}/comment/list")
     public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Integer qnaId) {
-        List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalse(qnaId);
+        List<Comment> comments = commentRepository.findByQnaIdAndDeletedFalseOrderByWroteAtDesc(qnaId);
         List<CommentResponse> results = new ArrayList<>();
 
         for (Comment comment : comments) {

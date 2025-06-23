@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface QnaRepository extends JpaRepository<Qna, Integer> {
 
-    // 전체 글 목록 조회
-    List<Qna> findByDeletedFalse();
+    // 전체 글 목록 최신순 조회
+    List<Qna> findByDeletedFalseOrderByWroteAtDesc();
 
     // 게시글 상세 조회
     Optional<Qna> findByIdAndDeletedFalse(Integer id);

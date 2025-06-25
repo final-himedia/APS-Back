@@ -42,7 +42,7 @@
 //
 //    @GetMapping("/tool-master/{scenarioId}")
 //    public ResponseEntity<?> getAllToolMaster(@PathVariable String scenarioId) {
-//        List<ToolMaster> toolMasters = toolMasterRepository.findByToolMasterIdScenarioId(scenarioId);
+//        List<ToolMaster> toolMasters = toolMasterRepository.findAllToolMastersByScenarioId(scenarioId);
 //
 //        Map<String, Object> response = new LinkedHashMap<>();
 //
@@ -54,7 +54,7 @@
 //    }
 //    @GetMapping("/tool-map/{scenarioId}")
 //    public ResponseEntity<?> getAllToolMap(@PathVariable String scenarioId) {
-//        List<ToolMap> toolMaps = toolMapRepository.findByToolMapIdScenarioId(scenarioId);
+//        List<ToolMap> toolMaps = toolMapRepository.findByScenarioId(scenarioId);
 //
 //        Map<String, Object> response = new LinkedHashMap<>();
 //
@@ -80,7 +80,7 @@
 //
 //    @GetMapping("/workcentermap/{scenarioId}")
 //    public ResponseEntity<?> getAllWorkCenterMap(@PathVariable String scenarioId) {
-//        List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findByWorkCenterMapIdScenarioId(scenarioId);
+//        List<WorkCenterMap> workCenterMaps = workCenterMapRepository.findByWorkCenterScenarioId(scenarioId);
 //
 //        Map<String, Object> response = new LinkedHashMap<>();
 //

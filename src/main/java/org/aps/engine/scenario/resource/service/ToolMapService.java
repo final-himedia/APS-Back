@@ -5,10 +5,7 @@
 //import org.apache.poi.ss.usermodel.*;
 //import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 //import org.aps.engine.scenario.resource.entity.ToolMap;
-//import org.aps.engine.scenario.resource.entity.ToolMapId;
-//import org.aps.engine.scenario.resource.entity.ToolMaster;
 //import org.aps.engine.scenario.resource.repository.ToolMapRepository;
-//import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 //import org.springframework.stereotype.Service;
 //import org.springframework.web.multipart.MultipartFile;
 //
@@ -28,17 +25,11 @@
 //        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
 //            Row row = sheet.getRow(i);
 //
-//            ToolMapId toolMapId = ToolMapId.builder()
-//                    .scenarioId(scenarioId)
-//                    .partId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
-//                    .toolId(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
-//                    .build();
 //
 //            ToolMap tool = ToolMap.builder()
-//                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
-//                    .toolSize(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
-//                    .partName(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
-//                    .toolMapId(toolMapId)
+//                    .toolSize(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(0)))
+//                    .partId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(1)))
+//                    .partName(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(2)))
 //                    .build();
 //
 //
@@ -67,21 +58,16 @@
 //        for (ToolMap tool : tools) {
 //            Row row = sheet.createRow(rowIdx++);
 //
-//            String siteId = tool.getSiteId() == null ? "" : tool.getSiteId();
 //            String toolSize = tool.getToolSize() == null ? "" : tool.getToolSize();
 //
-//            ToolMapId toolMapId = tool.getToolMapId();
-//            String partId = (toolMapId == null || toolMapId.getPartId() == null) ? "" : toolMapId.getPartId();
-//            String toolId = (toolMapId == null || toolMapId.getToolId() == null) ? "" : toolMapId.getToolId();
+//            String partId = (tool.getPartId() == null) ? "" : tool.getPartId();
 //
 //            String partName = tool.getPartName() == null ? "" : tool.getPartName();
 //
-//            row.createCell(0).setCellValue(siteId);
-//            row.createCell(1).setCellValue(toolSize);
-//            row.createCell(2).setCellValue(scenarioId);
-//            row.createCell(3).setCellValue(partId);
-//            row.createCell(4).setCellValue(toolId);
-//            row.createCell(5).setCellValue(partName);
+//            row.createCell(0).setCellValue(toolSize);
+//            row.createCell(1).setCellValue(partId);
+//            row.createCell(2).setCellValue(partName);
+//            row.createCell(3).setCellValue(scenarioId);
 //        }
 //
 //        // 응답 헤더 설정

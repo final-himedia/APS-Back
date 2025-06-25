@@ -10,6 +10,8 @@ import java.util.List;
 @Repository("bopBomRepository")
 public interface BomRepository extends JpaRepository<Bom, BomId> {
     List<Bom> findByBomIdScenarioId(String scenarioId);
+
+    List<Bom> findByBomId_ScenarioId(String scenarioId);
 }
 
 

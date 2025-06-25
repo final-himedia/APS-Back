@@ -3,7 +3,9 @@ package org.aps.engine.execution.service;
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 import org.aps.engine.execution.result.WorkcenterPlan;
+import org.aps.engine.scenario.bop.entity.Bom;
 import org.aps.engine.scenario.bop.entity.OperationRoute;
+import org.aps.engine.scenario.bop.repository.BomRepository;
 import org.aps.engine.scenario.bop.repository.OperationRouteRepository;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
 import org.aps.engine.scenario.resource.entity.WorkCenter;
@@ -11,13 +13,12 @@ import org.aps.engine.scenario.resource.entity.WorkCenterMap;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,85 +29,158 @@ public class ExecutionResultService {
     private final OperationRouteRepository operationRouteRepository;
     private final WorkCenterMapRepository workCenterMapRepository;
     private final ToolMasterRepository toolMasterRepository;
-
-    private static final LocalDateTime START_TIME = LocalDateTime.of(2025, 6, 4, 9, 0);
+    private final BomRepository bomRepository;
 
     public List<WorkcenterPlan> simulateSchedule(String scenarioId) {
-        Map<ToolMaster, LocalDateTime> toolAvailability = initToolAvailability();
-        Map<WorkCenter, LocalDateTime> wcAvailability = initWorkcenterAvailability();
+        LocalDateTime engineStart = LocalDateTime.now();
+        LocalDateTime startTime = LocalDateTime.of(2025, 6, 24, 0, 0);
 
-        List<OperationRoute> routes = operationRouteRepository.findById_ScenarioId(scenarioId);
-        System.out.println("선택된 routes: " + routes.size());
         List<WorkcenterPlan> resultPlans = new ArrayList<>();
 
-        for (OperationRoute route : routes) {
-            ToolMaster selectedTool = null;
-            for (ToolMaster candidate : toolAvailability.keySet()) {
-                if (selectedTool == null ||
-                        toolAvailability.get(candidate).isBefore(toolAvailability.get(selectedTool))) {
-                    selectedTool = candidate;
-                }
+        Map<ToolMaster, LocalDateTime> toolAvailableTime = new HashMap<>();
+        toolMasterRepository.findAll().forEach(tool -> toolAvailableTime.put(tool, startTime));
+
+        Map<WorkCenter, LocalDateTime> workcenterAvailableTime = new HashMap<>();
+        workcenterRepository.findAll().forEach(wc -> workcenterAvailableTime.put(wc, startTime));
+
+        List<OperationRoute> operationRoutes = operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);
+        List<Bom> boms = bomRepository.findByBomId_ScenarioId(scenarioId);
+        Map<String, List<Bom>> bomByOperationId = boms.stream().collect(Collectors.groupingBy(Bom::getOperationId));
+
+        Map<String, Integer> producedParts = new HashMap<>();
+        for (Bom bom : boms) producedParts.put(bom.getToPartName(), 0);
+
+        Map<String, Integer> availablePartsQty = new HashMap<>();
+        for (Bom bom : boms) {
+            String fromPart = bom.getFromPartName();
+            if (!producedParts.containsKey(fromPart)) {
+                availablePartsQty.put(fromPart, Integer.MAX_VALUE);
             }
-            if (selectedTool == null) continue;
-
-            List<WorkCenterMap> wcMaps = workCenterMapRepository.findByRoutingId(route.getRoutingId());
-            WorkCenterMap selectedWCMap = null;
-            for (WorkCenterMap wcMap : wcMaps) {
-                if (selectedWCMap == null ||
-                        wcAvailability.get(wcMap.getWorkCenter()).isBefore(wcAvailability.get(selectedWCMap.getWorkCenter()))) {
-                    selectedWCMap = wcMap;
-                }
-            }
-            if (selectedWCMap == null) continue;
-
-            WorkCenter selectedWC = selectedWCMap.getWorkCenter();
-
-            LocalDateTime startTime = toolAvailability.get(selectedTool).isAfter(wcAvailability.get(selectedWC)) ?
-                    toolAvailability.get(selectedTool) : wcAvailability.get(selectedWC);
-
-            double tact = Double.parseDouble(selectedWCMap.getTactTime());
-            LocalDateTime endTime = startTime.plusHours(Math.round(tact));
-
-
-            toolAvailability.put(selectedTool, endTime);
-            wcAvailability.put(selectedWC, endTime);
-
-            WorkcenterPlan plan = WorkcenterPlan.builder()
-                    .scenarioId(scenarioId)
-                    .workcenterId(selectedWC.getWorkCenterId().getWorkcenterId())
-                    .workcenterGroup(selectedWC.getWorkcenterGroup())
-                    .workcenterName(selectedWC.getWorkcenterName())
-                    .workcenterStartTime(startTime)
-                    .workcenterEndTime(endTime)
-                    .operationId(route.getId().getOperationId())
-                    .operationName(route.getOperationName())
-                    .operationType("")
-                    .toolId(selectedTool.getToolMasterId().getToolId())
-                    .toolName(selectedTool.getToolName())
-                    .build();
-
-            resultPlans.add(plan);
         }
 
-        System.out.println("생성된 계획 수: " + resultPlans.size());
+        for (OperationRoute route : operationRoutes) {
+            String opId = route.getId().getOperationId();
+            List<Bom> routeBoms = bomByOperationId.get(opId);
+            if (routeBoms == null || routeBoms.isEmpty()) continue;
+
+            boolean canExecute = true;
+            for (Bom bom : routeBoms) {
+                int available = availablePartsQty.getOrDefault(bom.getFromPartName(), 0);
+                int needed = (int) Double.parseDouble(bom.getInQty());
+                if (available < needed) {
+                    canExecute = false;
+                    break;
+                }
+            }
+            if (!canExecute) continue;
+
+            List<WorkCenterMap> wcMaps = workCenterMapRepository.findByRoutingId(route.getRoutingId());
+            if (wcMaps.isEmpty()) continue;
+
+            ToolMaster selectedTool = null;
+            WorkCenter selectedWorkcenter = null;
+            WorkCenterMap selectedWcMap = null;
+            LocalDateTime selectedStart = null;
+
+            for (WorkCenterMap wcMap : wcMaps) {
+                WorkCenter wc = wcMap.getWorkCenter();
+                LocalDateTime wcReady = workcenterAvailableTime.getOrDefault(wc, startTime);
+
+                for (ToolMaster tool : toolAvailableTime.keySet()) {
+                    LocalDateTime toolReady = toolAvailableTime.getOrDefault(tool, startTime);
+                    LocalDateTime candidateStart = wcReady.isAfter(toolReady) ? wcReady : toolReady;
+
+                    if (selectedStart == null || candidateStart.isBefore(selectedStart)) {
+                        selectedStart = candidateStart;
+                        selectedTool = tool;
+                        selectedWorkcenter = wc;
+                        selectedWcMap = wcMap;
+                    }
+                }
+            }
+
+            if (selectedTool == null || selectedWorkcenter == null || selectedWcMap == null) continue;
+
+            for (Bom bom : routeBoms) {
+                int inQty = (int) Double.parseDouble(bom.getInQty());
+                int outQty = (int) Double.parseDouble(bom.getOutQty());
+
+                double procTimeHour;
+                try {
+                    procTimeHour = Double.parseDouble(selectedWcMap.getProcTime());
+                } catch (Exception e) {
+                    procTimeHour = 1.0;
+                }
+                long procTimeMinutes = (long) Math.ceil(procTimeHour * 60 * inQty);
+
+                LocalDateTime endTime = selectedStart.plusMinutes(procTimeMinutes);
+
+                // 자원 사용 시간 갱신
+                workcenterAvailableTime.put(selectedWorkcenter, endTime);
+                toolAvailableTime.put(selectedTool, endTime);
+
+                // 자재 수량 갱신
+                int fromQty = availablePartsQty.getOrDefault(bom.getFromPartName(), 0);
+                availablePartsQty.put(bom.getFromPartName(), fromQty - inQty);
+
+                int toQty = availablePartsQty.getOrDefault(bom.getToPartName(), 0);
+                availablePartsQty.put(bom.getToPartName(), toQty + outQty);
+
+                WorkcenterPlan plan = WorkcenterPlan.builder()
+                        .scenarioId(scenarioId)
+                        .operationId(route.getId().getOperationId())
+                        .operationName(route.getOperationName())
+                        .operationType(route.getOperationType())
+                        .workcenterId(selectedWorkcenter.getWorkCenterId().getWorkcenterId())
+                        .workcenterName(selectedWorkcenter.getWorkcenterName())
+                        .workcenterGroup(selectedWorkcenter.getWorkcenterGroup())
+                        .workcenterStartTime(selectedStart)
+                        .workcenterEndTime(endTime)
+                        .toolId(selectedTool.getToolMasterId().getToolId())
+                        .toolName(selectedTool.getToolName())
+                        .fromPartId(bom.getFromPartName())
+                        .toPartId(bom.getToPartName())
+                        .inQty((double) inQty)
+                        .inUom(bom.getInUom())
+                        .outQty((double) outQty)
+                        .outUom(bom.getOutUom())
+                        .build();
+
+                resultPlans.add(plan);
+            }
+        }
 
         workcenterPlanRepository.saveAll(resultPlans);
         return resultPlans;
     }
 
-    private Map<ToolMaster, LocalDateTime> initToolAvailability() {
-        Map<ToolMaster, LocalDateTime> map = new HashMap<>();
-        for (ToolMaster tool : toolMasterRepository.findAll()) {
-            map.put(tool, START_TIME);
-        }
-        return map;
+
+    public List<OperationRoute> getRoutesByScenario(String scenarioId) {
+        return operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);
     }
 
-    private Map<WorkCenter, LocalDateTime> initWorkcenterAvailability() {
-        Map<WorkCenter, LocalDateTime> map = new HashMap<>();
-        for (WorkCenter wc : workcenterRepository.findAll()) {
-            map.put(wc, START_TIME);
+    public List<WorkCenter> getWorkcenterByScenario(String scenarioId) {
+        return workcenterRepository.findByWorkCenterIdScenarioId(scenarioId);
+    }
+
+    public List<ToolMaster> getUsedToolsByScenario(String scenarioId) {
+        List<WorkcenterPlan> plans = simulateSchedule(scenarioId);
+        List<ToolMaster> allTools = toolMasterRepository.findAll();
+
+        Set<String> toolIds = new HashSet<>();
+        for (WorkcenterPlan plan : plans) {
+            toolIds.add(plan.getToolId());
         }
-        return map;
+
+        List<ToolMaster> result = new ArrayList<>();
+        for (ToolMaster tool : allTools) {
+            String currentToolId = tool.getToolMasterId().getToolId();
+            if (toolIds.contains(currentToolId)) {
+                result.add(tool);
+            }
+        }
+
+        return result;
     }
 }
+

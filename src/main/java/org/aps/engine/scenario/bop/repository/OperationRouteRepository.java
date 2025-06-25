@@ -11,5 +11,7 @@ import java.util.List;
 
 @Repository
 public interface OperationRouteRepository extends JpaRepository<OperationRoute, OperationRouteId> {
+    List<OperationRoute> findById_ScenarioIdOrderByOperationSeq(String scenarioId);
+
     List<OperationRoute> findById_ScenarioId(String scenarioId);
 }

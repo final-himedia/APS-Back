@@ -27,4 +27,11 @@ public class WorkcenterPlan {
     private String operationType;
     private String toolId;
     private String toolName;
+    private String toPartId;
+    private String fromPartId;
+    private Double inQty;
+    private String inUom;
+    private Double outQty;
+    private String outUom;
+    private Integer toolSize;
 }

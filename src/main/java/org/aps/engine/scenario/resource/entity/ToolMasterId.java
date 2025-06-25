@@ -14,4 +14,5 @@ import java.io.Serializable;
 public class ToolMasterId implements Serializable {
     private String toolId;
     private String siteId;
+    private String scenarioId;
 }

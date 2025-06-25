@@ -37,5 +37,5 @@ public class OperationRoute {
 
     private String sourcingType;
 
-    private BigDecimal yield;
+    private Double  yield;
 }

@@ -16,6 +16,7 @@ public class WorkcenterPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer no;
+    private String routingId;
     private String workcenterId;
     private String workcenterGroup;
     private String workcenterName;
@@ -27,11 +28,5 @@ public class WorkcenterPlan {
     private String operationType;
     private String toolId;
     private String toolName;
-    private String toPartId;
-    private String fromPartId;
-    private Double inQty;
-    private String inUom;
-    private Double outQty;
-    private String outUom;
     private Integer toolSize;
 }

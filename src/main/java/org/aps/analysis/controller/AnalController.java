@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnalController {
     private final AnalService analService;
 
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity<?> runAnal(
-            @RequestParam String scenarioId,
-            @RequestParam String userId) {
+            @RequestParam String scenarioId, @RequestParam String userId) {
         Anal saveAnal = analService.runSimulationAndSaveAnal(scenarioId, userId);
         return ResponseEntity.ok(saveAnal);
     }

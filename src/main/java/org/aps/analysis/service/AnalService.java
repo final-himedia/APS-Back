@@ -43,7 +43,6 @@ public class AnalService {
                 .durationMinutes(Duration.between(start, end).toMinutes())
                 .build();
 
-
         return analRepository.save(anal);
     }
 }

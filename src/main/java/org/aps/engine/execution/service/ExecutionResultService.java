@@ -1,6 +1,5 @@
 package org.aps.engine.execution.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 import org.aps.engine.execution.result.WorkcenterPlan;
@@ -80,35 +79,29 @@ public class ExecutionResultService {
                     procTimeHour = 1.0;
                 }
 
-                int parallelUnit = 2;
                 double unitProcTime = procTimeHour * 60; // in minutes
-                int inQty = 1; // 기본 투입 수량 1
-                int numUnits = (int) Math.ceil((double) inQty / parallelUnit);
+                LocalDateTime unitEnd = selectedStart.plusMinutes((long) unitProcTime);
 
-                LocalDateTime currentStart = selectedStart;
-                for (int i = 0; i < numUnits; i++) {
-                    LocalDateTime unitEnd = currentStart.plusMinutes((long) unitProcTime);
-                    WorkcenterPlan plan = WorkcenterPlan.builder()
-                            .scenarioId(scenarioId)
-                            .routingId(route.getRoutingId())
-                            .operationId(route.getId().getOperationId())
-                            .operationName(route.getOperationName())
-                            .operationType(route.getOperationType())
-                            .workcenterId(selectedWorkcenter.getWorkCenterId().getWorkcenterId())
-                            .workcenterName(selectedWorkcenter.getWorkcenterName())
-                            .workcenterGroup(selectedWorkcenter.getWorkcenterGroup())
-                            .workcenterStartTime(currentStart)
-                            .workcenterEndTime(unitEnd)
-                            .toolId(selectedTool.getToolMasterId().getToolId())
-                            .toolName(selectedTool.getToolName())
-                            .build();
+                WorkcenterPlan plan = WorkcenterPlan.builder()
+                        .scenarioId(scenarioId)
+                        .routingId(route.getRoutingId())
+                        .operationId(route.getId().getOperationId())
+                        .operationName(route.getOperationName())
+                        .operationType(route.getOperationType())
+                        .workcenterId(selectedWorkcenter.getWorkCenterId().getWorkcenterId())
+                        .workcenterName(selectedWorkcenter.getWorkcenterName())
+                        .workcenterGroup(selectedWorkcenter.getWorkcenterGroup())
+                        .workcenterStartTime(selectedStart)
+                        .workcenterEndTime(unitEnd)
+                        .toolId(selectedTool.getToolMasterId().getToolId())
+                        .toolName(selectedTool.getToolName())
+                        .build();
 
-                    resultPlans.add(plan);
-                    currentStart = unitEnd;
-                }
+                resultPlans.add(plan);
 
-                workcenterAvailableTime.put(selectedWorkcenter, currentStart);
-                toolAvailableTime.put(selectedTool, currentStart);
+                // 자원 가용 시간 업데이트
+                workcenterAvailableTime.put(selectedWorkcenter, unitEnd);
+                toolAvailableTime.put(selectedTool, unitEnd);
             }
         }
 

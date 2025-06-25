@@ -21,4 +21,6 @@ public interface QnaRepository extends JpaRepository<Qna, Integer> {
 
     // 작성자 글 검색
     List<Qna> findByWriterIdAndDeletedFalse(Long writerId);
+
+    List<Qna> findByCategory(String category);
 }

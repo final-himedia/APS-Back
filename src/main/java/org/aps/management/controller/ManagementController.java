@@ -125,7 +125,44 @@ public class ManagementController {
     // 전체 게시글 목록 조회
     @GetMapping("/qna/list")
     public ResponseEntity<List<QnaResponse>> allQnas() {
-        List<Qna> qnas = qnaRepository.findByDeletedFalseOrderByWroteAtDesc();
+        List<Qna> qnas = qnaRepository.findByDeletedFalseOrderByWroteAtDesc(); // 이미 최신순임
+
+        List<QnaResponse> noticeList = new ArrayList<>();
+        List<QnaResponse> normalList = new ArrayList<>();
+
+        for (Qna qna : qnas) {
+            User writer = userRepository.findById(qna.getWriterId()).orElse(null);
+
+            QnaResponse response = QnaResponse.builder()
+                    .id(qna.getId())
+                    .writerId(qna.getWriterId())
+                    .title(qna.getTitle())
+                    .content(qna.getContent())
+                    .wroteAt(qna.getWroteAt())
+                    .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
+                    .name(writer != null ? writer.getName() : "이름 없음")
+                    .category(qna.getCategory())
+                    .build();
+
+            // notice면 notice 리스트에, 아니면 일반 리스트에
+            if ("notice".equalsIgnoreCase(qna.getCategory())) {
+                noticeList.add(response);
+            } else {
+                normalList.add(response);
+            }
+        }
+
+        // 결과 합치기
+        List<QnaResponse> finalResults = new ArrayList<>();
+        finalResults.addAll(noticeList);
+        finalResults.addAll(normalList);
+
+        return ResponseEntity.ok(finalResults);
+    }
+
+    @GetMapping("/qna/common/list")
+    public ResponseEntity<List<QnaResponse>> commonQnas(@RequestParam("common") String c) {
+        List<Qna> qnas = qnaRepository.findByCategory(c);
         List<QnaResponse> results = new ArrayList<>();
 
         for (Qna qna : qnas) {
@@ -139,6 +176,31 @@ public class ManagementController {
                     .wroteAt(qna.getWroteAt())
                     .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
                     .name(writer != null ? writer.getName() : "이름 없음")
+                    .category(qna.getCategory())
+                    .build();
+
+            results.add(response);
+        }
+
+        return ResponseEntity.status(200).body(results);
+    }
+    @GetMapping("/qna/notice/list")
+    public ResponseEntity<List<QnaResponse>> noticeQnas(@RequestParam("notice") String n) {
+        List<Qna> qnas = qnaRepository.findByCategory(n);
+        List<QnaResponse> results = new ArrayList<>();
+
+        for (Qna qna : qnas) {
+            User writer = userRepository.findById(qna.getWriterId()).orElse(null);
+
+            QnaResponse response = QnaResponse.builder()
+                    .id(qna.getId())
+                    .writerId(qna.getWriterId())
+                    .title(qna.getTitle())
+                    .content(qna.getContent())
+                    .wroteAt(qna.getWroteAt())
+                    .email(writer != null ? writer.getEmail() : "알 수 없는 사용자")
+                    .name(writer != null ? writer.getName() : "이름 없음")
+                    .category(qna.getCategory())
                     .build();
 
             results.add(response);
@@ -176,6 +238,9 @@ public class ManagementController {
         if (loginUser == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
         }
+        if (request.getCategory().equals("common")){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "공지글은 작성자만 작성 가능.");
+        }
 
         // 새 게시글 생성
         Qna newQna = Qna.builder()
@@ -184,6 +249,7 @@ public class ManagementController {
                 .content(request.getContent())
                 .wroteAt(LocalDateTime.now())
                 .deleted(false)
+                .category(request.getCategory())
                 .build();
 
         Qna saved = qnaRepository.save(newQna);

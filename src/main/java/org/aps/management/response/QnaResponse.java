@@ -17,4 +17,5 @@ public class QnaResponse {
     private LocalDateTime wroteAt;
     private String email;
     private String name;
+    private String category;
 }

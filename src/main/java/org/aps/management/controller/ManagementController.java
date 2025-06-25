@@ -238,8 +238,8 @@ public class ManagementController {
         if (loginUser == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
         }
-        if (request.getCategory().equals("common")){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "공지글은 작성자만 작성 가능.");
+        if (!loginUser.getRole().equals("Admin")&&request.getCategory().equals("notice")){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "공지글은 관리자만 작성 가능");
         }
 
         // 새 게시글 생성

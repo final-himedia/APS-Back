@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.aps.analysis.entity.Anal;
 import org.aps.analysis.repository.AnalRepository;
 import org.aps.engine.execution.service.ExecutionResultService;
+import org.aps.engine.response.AnalResponse;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -22,25 +23,29 @@ public class AnalService {
 
         String status = "완료";
         String errorMessage = null;
-        LocalDateTime end;
+        LocalDateTime actualStart;
+        LocalDateTime actualEnd;
 
         try {
-            executionResultService.simulateSchedule(scenarioId);
-            end = LocalDateTime.now();
+            AnalResponse result = executionResultService.simulateSchedule(scenarioId);
+            actualStart = result.getStartTime();
+            actualEnd = result.getEndTime();
         } catch (Exception e) {
             status = "실패";
             errorMessage = e.getMessage();
-            end = LocalDateTime.now();
+            actualStart = start;
+            actualEnd = LocalDateTime.now();
         }
 
         Anal anal = Anal.builder()
+                .scenarioId(scenarioId) // ← 필요시
                 .version(version)
                 .userId(userId)
-                .startTime(start)
-                .endTime(end)
+                .startTime(actualStart)
+                .endTime(actualEnd)
+                .durationMinutes(Duration.between(actualStart, actualEnd).toMinutes())
                 .status(status)
                 .errorMessage(errorMessage)
-                .durationMinutes(Duration.between(start, end).toMinutes())
                 .build();
 
         return analRepository.save(anal);

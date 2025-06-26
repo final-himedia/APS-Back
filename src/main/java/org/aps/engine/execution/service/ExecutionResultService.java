@@ -2,11 +2,14 @@ package org.aps.engine.execution.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.aps.analysis.entity.Anal;
+import org.aps.analysis.repository.AnalRepository;
 import org.aps.analysis.request.AnalRequest;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 
 
 import org.aps.engine.execution.result.WorkcenterPlan;
+import org.aps.engine.response.AnalResponse;
 import org.aps.engine.scenario.bop.entity.OperationRoute;
 import org.aps.engine.scenario.bop.repository.OperationRouteRepository;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
@@ -33,9 +36,11 @@ public class ExecutionResultService {
     private final OperationRouteRepository operationRouteRepository;
     private final WorkCenterMapRepository workCenterMapRepository;
     private final ToolMasterRepository toolMasterRepository;
+    private final AnalRepository analRepository;
 
     @Transactional
-    public List<WorkcenterPlan> simulateSchedule(String scenarioId) {
+    public AnalResponse simulateSchedule(String scenarioId) {
+        LocalDateTime engineStart = LocalDateTime.now();
         LocalDateTime startTime = LocalDateTime.of(2025, 6, 24, 0, 0);
         List<WorkcenterPlan> resultPlans = new ArrayList<>();
 
@@ -146,7 +151,13 @@ public class ExecutionResultService {
             workcenterPlanRepository.saveAll(resultPlans);
         }
         workcenterPlanRepository.saveAll(resultPlans);
-        return resultPlans;
+        LocalDateTime finishEngine = LocalDateTime.now();
+
+        return  AnalResponse.builder().
+                plans(resultPlans).
+                endTime(finishEngine).
+                startTime(startTime).
+                build();
     }
 
 
@@ -160,7 +171,7 @@ public class ExecutionResultService {
     }
 
     public List<ToolMaster> getUsedToolsByScenario(String scenarioId) {
-        List<WorkcenterPlan> plans = simulateSchedule(scenarioId);
+        List<WorkcenterPlan> plans = (List<WorkcenterPlan>) simulateSchedule(scenarioId);
         List<ToolMaster> allTools = toolMasterRepository.findAll();
 
         Set<String> toolIds = plans.stream()

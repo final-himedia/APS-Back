@@ -22,4 +22,5 @@ public class Anal {
     private LocalDateTime endTime;
     private String errorMessage;
     private String userId;
+    private String scenarioId;
 }

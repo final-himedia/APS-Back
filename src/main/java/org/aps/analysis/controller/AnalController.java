@@ -2,6 +2,7 @@ package org.aps.analysis.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.aps.analysis.entity.Anal;
+import org.aps.analysis.repository.AnalRepository;
 import org.aps.analysis.request.AnalRequest;
 import org.aps.analysis.service.AnalService;
 import org.aps.engine.execution.service.ExecutionResultService;
@@ -17,11 +18,12 @@ import java.util.Map;
 public class AnalController {
     private final AnalService analService;
     private final ExecutionResultService executionResultService;
+    private final AnalRepository analRepository;
 
     // 시뮬레이션 실행
-    @GetMapping()
+    @GetMapping("/get")
     public ResponseEntity<?> runAnal(
-            @RequestParam String scenarioId, @RequestParam String userId) {
+            @RequestParam("scenarioId") String scenarioId, @RequestParam("userId") String userId) {
         Anal saveAnal = analService.runSimulationAndSaveAnal(scenarioId, userId);
         return ResponseEntity.ok(saveAnal);
     }
@@ -35,6 +37,13 @@ public class AnalController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(ganttData);
+    }
+
+    @GetMapping("get/{scenarioId}")
+    public ResponseEntity<?> getAnalByScenarioId(@PathVariable("scenarioId") String s){
+        List<Anal> anals = analRepository.findAllByScenarioId(s);
+        return ResponseEntity.ok(anals);
+
     }
 
 }

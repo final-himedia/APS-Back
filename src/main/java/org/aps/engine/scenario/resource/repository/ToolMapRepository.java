@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository("resourceToolMapRepository")
 public interface ToolMapRepository extends JpaRepository<ToolMap, String> {
+
+
     List<ToolMap> findByScenarioId(String scenarioId);
-
-
 }

@@ -29,13 +29,13 @@ public class WorkCenterMapService {
 
 
             WorkCenterMap workCenterMap = WorkCenterMap.builder()
-                    .partId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(2)))
-                    .routingGroup(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(4)))
-                    .routingVersion(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(5)))
-                    .tactTime(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(7)))
-                    .tactTimeUom(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(8)))
-                    .procTime(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(9)))
-                    .procTimeUom(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(10)))
+                    .partId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .routingGroup(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .routingVersion(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .tactTime(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(7)))
+                    .tactTimeUom(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(8)))
+                    .procTime(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(9)))
+                    .procTimeUom(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(10)))
                     .build();
 
             workCenterMapRepository.save(workCenterMap);
@@ -65,14 +65,14 @@ public class WorkCenterMapService {
 
 
 
-            row.createCell(2).setCellValue(map.getPartId() == null ? "" : map.getPartId());
-            row.createCell(3).setCellValue(map.getRoutingGroup() == null ? "" : map.getRoutingGroup());
-            row.createCell(4).setCellValue(map.getRoutingVersion() == null ? "" : map.getRoutingVersion());
-            row.createCell(5).setCellValue(map.getTactTime() == null ? "" : map.getTactTime());
-            row.createCell(6).setCellValue(map.getTactTimeUom() == null ? "" : map.getTactTimeUom());
-            row.createCell(7).setCellValue(map.getProcTime() == null ? "" : map.getProcTime());
-            row.createCell(8).setCellValue(map.getProcTimeUom() == null ? "" : map.getProcTimeUom());
-            row.createCell(9).setCellValue(scenarioId);
+            row.createCell(0).setCellValue(map.getPartId() == null ? "" : map.getPartId());
+            row.createCell(1).setCellValue(map.getRoutingGroup() == null ? "" : map.getRoutingGroup());
+            row.createCell(2).setCellValue(map.getRoutingVersion() == null ? "" : map.getRoutingVersion());
+            row.createCell(3).setCellValue(map.getTactTime() == null ? "" : map.getTactTime());
+            row.createCell(4).setCellValue(map.getTactTimeUom() == null ? "" : map.getTactTimeUom());
+            row.createCell(5).setCellValue(map.getProcTime() == null ? "" : map.getProcTime());
+            row.createCell(6).setCellValue(map.getProcTimeUom() == null ? "" : map.getProcTimeUom());
+            row.createCell(7).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

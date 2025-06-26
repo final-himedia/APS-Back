@@ -42,9 +42,7 @@ public class ExecutionResultService {
             toolAvailableTime.put(toolId, startTime);
             toolMap.put(toolId, tool);
         }
-        if (tools.isEmpty()) {
-            throw new IllegalStateException("툴이 시나리오에 없습니다.");
-        }
+
 
         // 2. WorkCenter 초기화
         Map<String, LocalDateTime> workcenterAvailableTime = new HashMap<>();
@@ -66,7 +64,6 @@ public class ExecutionResultService {
 
             // 이 operation에 해당하는 WorkCenterMap들 (라우팅, 시나리오 조건)
             List<WorkCenterMap> wcMaps = workCenterMapRepository.findByOperationRoute_Id_RoutingIdAndOperationRoute_Id_ScenarioId(routingId, scenarioId);
-            if (wcMaps.isEmpty()) continue;
 
             String selectedWorkcenterId = null;
             WorkCenterMap selectedWcMap = null;
@@ -88,8 +85,6 @@ public class ExecutionResultService {
                 }
             }
 
-            if (selectedWorkcenterId == null || selectedWcMap == null) continue;
-
             // 툴 선택: 가장 빨리 준비된 툴 선택
             String selectedToolId = null;
             LocalDateTime earliestToolReady = null;
@@ -100,7 +95,6 @@ public class ExecutionResultService {
                     selectedToolId = toolId;
                 }
             }
-            if (selectedToolId == null) continue;
 
             LocalDateTime toolReady = toolAvailableTime.get(selectedToolId);
 
@@ -239,7 +233,6 @@ public class ExecutionResultService {
                 taskId++;
             }
         }
-
         return result;
     }
 

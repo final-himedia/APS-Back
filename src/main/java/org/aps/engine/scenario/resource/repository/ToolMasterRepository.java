@@ -15,4 +15,7 @@ public interface ToolMasterRepository extends JpaRepository<ToolMaster, String> 
 
 
     List<ToolMaster> findAllByToolMasterId_ScenarioId(String scenarioId);
+
+
+    List<ToolMaster> findAllToolMastersByToolMasterId_ScenarioId(String scenarioId);
 }

@@ -94,24 +94,24 @@ public class BopController {
     }
 
 
-//    @PostMapping("/bom-save")
-//    public ResponseEntity<?> saveBom(@RequestBody List<Bom> boms) {
-//        List<Bom> saved = bomRepository.saveAll(boms);
-//        return ResponseEntity.ok(Map.of(
-//                "status", 200,
-//                "message", "저장 완료"
-//        ));
-//    }
-//
-//    @DeleteMapping("/bom-delete")
-//    public ResponseEntity<?> deleteBom(@RequestBody List<BomId> ids) {
-//        bomRepository.deleteAllById(ids);
-//        return ResponseEntity.ok(Map.of(
-//                "status", 200,
-//                "message", "삭제 완료",
-//                "deletedIds", ids
-//        ));
-//    }
+    @PostMapping("/bom-save")
+    public ResponseEntity<?> saveBom(@RequestBody List<Bom> boms) {
+        List<Bom> saved = bomRepository.saveAll(boms);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "저장 완료"
+        ));
+    }
+
+    @DeleteMapping("/bom-delete")
+    public ResponseEntity<?> deleteBom(@RequestBody List<BomId> ids) {
+        bomRepository.deleteAllById(ids);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "삭제 완료",
+                "deletedIds", ids
+        ));
+    }
 
 
     @PostMapping("/part-save")

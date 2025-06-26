@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface WorkcenterPlanRepository extends JpaRepository<WorkcenterPlan, Integer > {
+
+
     List<WorkcenterPlan> findAllByScenarioId(String scenarioId);
 
     // 시나리오 ID가 일치하고, 작업 시간이 지정된 기간(start~end) 내에 있는 작업 계획 조회
@@ -17,4 +19,3 @@ public interface WorkcenterPlanRepository extends JpaRepository<WorkcenterPlan, 
             String scenarioId, LocalDateTime startTime, LocalDateTime endTime
     );
 }
-

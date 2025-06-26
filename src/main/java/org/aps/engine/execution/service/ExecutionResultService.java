@@ -3,7 +3,8 @@ package org.aps.engine.execution.service;
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 
-import org.aps.engine.result.entity.workcenterPlan;
+import org.aps.engine.execution.result.WorkcenterPlan;
+
 import org.aps.engine.scenario.bop.entity.OperationRoute;
 import org.aps.engine.scenario.bop.repository.OperationRouteRepository;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
@@ -29,9 +30,9 @@ public class ExecutionResultService {
     private final WorkCenterMapRepository workCenterMapRepository;
     private final ToolMasterRepository toolMasterRepository;
 
-    public List<workcenterPlan> simulateSchedule(String scenarioId) {
+    public List<WorkcenterPlan> simulateSchedule(String scenarioId) {
         LocalDateTime startTime = LocalDateTime.of(2025, 6, 24, 0, 0);
-        List<workcenterPlan> resultPlans = new ArrayList<>();
+        List<WorkcenterPlan> resultPlans = new ArrayList<>();
 
         // 1. Tool 초기화 (scenarioId 기준)
         Map<String, LocalDateTime> toolAvailableTime = new HashMap<>();
@@ -113,7 +114,7 @@ public class ExecutionResultService {
             ToolMaster selectedTool = toolMap.get(selectedToolId);
             WorkCenter selectedWorkcenter = workcenterMap.get(selectedWorkcenterId);
 
-            workcenterPlan plan = workcenterPlan.builder()
+            WorkcenterPlan plan = WorkcenterPlan.builder()
                     .scenarioId(scenarioId)
                     .routingId(route.getId().getRoutingId())
                     .operationId(route.getId().getOperationId())
@@ -151,11 +152,11 @@ public class ExecutionResultService {
     }
 
     public List<ToolMaster> getUsedToolsByScenario(String scenarioId) {
-        List<workcenterPlan> plans = simulateSchedule(scenarioId);
+        List<WorkcenterPlan> plans = simulateSchedule(scenarioId);
         List<ToolMaster> allTools = toolMasterRepository.findAll();
 
         Set<String> toolIds = plans.stream()
-                .map(workcenterPlan::getToolId)
+                .map(WorkcenterPlan::getToolId)
                 .collect(Collectors.toSet());
 
         return allTools.stream()
@@ -164,30 +165,30 @@ public class ExecutionResultService {
     }
 
     public List<Map<String, Object>> getExecutionResult(String scenarioId) {
-        List<workcenterPlan> plans = workcenterPlanRepository.findAllByScenarioId(scenarioId);
+        List<WorkcenterPlan> plans = workcenterPlanRepository.findAllByScenarioId(scenarioId);
         List<Map<String, Object>> result = new ArrayList<>();
 
         // 라우팅 ID로 그룹핑
-        Map<String, List<workcenterPlan>> grouped = plans.stream()
-                .collect(Collectors.groupingBy(workcenterPlan::getRoutingId));
+        Map<String, List<WorkcenterPlan>> grouped = plans.stream()
+                .collect(Collectors.groupingBy(WorkcenterPlan::getRoutingId));
 
         // 라우팅 그룹을 시작일 기준으로 정렬
-        List<Map.Entry<String, List<workcenterPlan>>> sortedGroups = grouped.entrySet().stream()
+        List<Map.Entry<String, List<WorkcenterPlan>>> sortedGroups = grouped.entrySet().stream()
                 .sorted(Comparator.comparing(entry ->
                         entry.getValue().stream()
-                                .map(workcenterPlan::getWorkcenterStartTime)
+                                .map(WorkcenterPlan::getWorkcenterStartTime)
                                 .min(LocalDateTime::compareTo)
                                 .orElse(LocalDateTime.MAX)))
                 .collect(Collectors.toList());
 
         int taskId = 1;
 
-        for (Map.Entry<String, List<workcenterPlan>> entry : sortedGroups) {
+        for (Map.Entry<String, List<WorkcenterPlan>> entry : sortedGroups) {
             String routingId = entry.getKey();
-            List<workcenterPlan> groupPlans = entry.getValue();
+            List<WorkcenterPlan> groupPlans = entry.getValue();
 
             // 그룹 내 작업들을 시작 시간 기준 정렬
-            groupPlans.sort(Comparator.comparing(workcenterPlan::getWorkcenterStartTime));
+            groupPlans.sort(Comparator.comparing(WorkcenterPlan::getWorkcenterStartTime));
 
             // 부모 Task 생성
             Map<String, Object> parentTask = new HashMap<>();
@@ -195,12 +196,12 @@ public class ExecutionResultService {
             parentTask.put("TaskName", routingId);
 
             LocalDateTime groupStart = groupPlans.stream()
-                    .map(workcenterPlan::getWorkcenterStartTime)
+                    .map(WorkcenterPlan::getWorkcenterStartTime)
                     .min(LocalDateTime::compareTo)
                     .orElse(null);
 
             LocalDateTime groupEnd = groupPlans.stream()
-                    .map(workcenterPlan::getWorkcenterEndTime)
+                    .map(WorkcenterPlan::getWorkcenterEndTime)
                     .max(LocalDateTime::compareTo)
                     .orElse(null);
 
@@ -213,7 +214,7 @@ public class ExecutionResultService {
             taskId++;
 
             // 자식 Task 생성
-            for (workcenterPlan plan : groupPlans) {
+            for (WorkcenterPlan plan : groupPlans) {
                 Map<String, Object> childTask = new HashMap<>();
                 childTask.put("TaskID", taskId);
                 childTask.put("ParentId", parentTaskId);

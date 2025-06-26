@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aps.engine.scenario.bop.entity.Operation;
-import org.aps.engine.scenario.bop.entity.OperationId;
+
 import org.aps.engine.scenario.resource.entity.ToolMaster;
 import org.aps.engine.scenario.resource.entity.ToolMasterId;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
@@ -35,14 +34,13 @@ public class ToolMasterService {
             ToolMasterId toolMasterId = ToolMasterId.builder()
                     .siteId(siteId)
                     .toolId(toolId)
-                    .scenarioId(scenarioId)
                     .build();
 
             String cavityStr = row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3));
             Integer cavity = cavityStr.isEmpty() ? 0 : Integer.valueOf(cavityStr);
 
             String toolState = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
-            String toolName = row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5));
+            String toolName = row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(4));
 
             ToolMaster tool = ToolMaster.builder()
                     .toolMasterId(toolMasterId)
@@ -63,7 +61,7 @@ public class ToolMasterService {
         Sheet sheet = workbook.createSheet("TOOL_MASTER");
 
         String[] headers = {
-                "site_id", "tool_id", "tool_state", "tool_cavity", "scenario_id", "tool_name"
+                "site_id", "tool_id", "tool_state", "tool_cavity", "tool_name"
         };
 
         Row header = sheet.createRow(0);

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.engine.scenario.resource.entity.WorkCenterMap;
-import org.aps.engine.scenario.resource.entity.WorkCenterMapId;
+
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,23 +26,16 @@ public class WorkCenterMapService {
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
-            WorkCenterMapId workCenterMapId = WorkCenterMapId.builder()
-                    .operationId(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(3)))
-                    .workcenterId(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(6)))
-                    .scenarioId(scenarioId)
-                    .build();
+
 
             WorkCenterMap workCenterMap = WorkCenterMap.builder()
-                    .workCenterMapId(workCenterMapId)
-                    .siteId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(0)))
-                    .routingId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(1)))
-                    .partId(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2)))
-                    .routingGroup(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4)))
-                    .routingVersion(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(5)))
-                    .tactTime(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(7)))
-                    .tactTimeUom(row.getCell(8) == null ? "" : formatter.formatCellValue(row.getCell(8)))
-                    .procTime(row.getCell(9) == null ? "" : formatter.formatCellValue(row.getCell(9)))
-                    .procTimeUom(row.getCell(10) == null ? "" : formatter.formatCellValue(row.getCell(10)))
+                    .partId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(2)))
+                    .routingGroup(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(4)))
+                    .routingVersion(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(5)))
+                    .tactTime(row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(7)))
+                    .tactTimeUom(row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(8)))
+                    .procTime(row.getCell(6) == null ? "" : formatter.formatCellValue(row.getCell(9)))
+                    .procTimeUom(row.getCell(7) == null ? "" : formatter.formatCellValue(row.getCell(10)))
                     .build();
 
             workCenterMapRepository.save(workCenterMap);
@@ -70,20 +63,16 @@ public class WorkCenterMapService {
         for (WorkCenterMap map : workCenterMaps) {
             Row row = sheet.createRow(rowIdx++);
 
-            WorkCenterMapId wcId = map.getWorkCenterMapId();
 
-            row.createCell(0).setCellValue(map.getSiteId() == null ? "" : map.getSiteId());
-            row.createCell(1).setCellValue(map.getRoutingId() == null ? "" : map.getRoutingId());
+
             row.createCell(2).setCellValue(map.getPartId() == null ? "" : map.getPartId());
-            row.createCell(3).setCellValue(wcId != null && wcId.getOperationId() != null ? wcId.getOperationId() : "");
-            row.createCell(4).setCellValue(map.getRoutingGroup() == null ? "" : map.getRoutingGroup());
-            row.createCell(5).setCellValue(map.getRoutingVersion() == null ? "" : map.getRoutingVersion());
-            row.createCell(6).setCellValue(wcId != null && wcId.getWorkcenterId() != null ? wcId.getWorkcenterId() : "");
-            row.createCell(7).setCellValue(map.getTactTime() == null ? "" : map.getTactTime());
-            row.createCell(8).setCellValue(map.getTactTimeUom() == null ? "" : map.getTactTimeUom());
-            row.createCell(9).setCellValue(map.getProcTime() == null ? "" : map.getProcTime());
-            row.createCell(10).setCellValue(map.getProcTimeUom() == null ? "" : map.getProcTimeUom());
-            row.createCell(11).setCellValue(scenarioId);
+            row.createCell(3).setCellValue(map.getRoutingGroup() == null ? "" : map.getRoutingGroup());
+            row.createCell(4).setCellValue(map.getRoutingVersion() == null ? "" : map.getRoutingVersion());
+            row.createCell(5).setCellValue(map.getTactTime() == null ? "" : map.getTactTime());
+            row.createCell(6).setCellValue(map.getTactTimeUom() == null ? "" : map.getTactTimeUom());
+            row.createCell(7).setCellValue(map.getProcTime() == null ? "" : map.getProcTime());
+            row.createCell(8).setCellValue(map.getProcTimeUom() == null ? "" : map.getProcTimeUom());
+            row.createCell(9).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

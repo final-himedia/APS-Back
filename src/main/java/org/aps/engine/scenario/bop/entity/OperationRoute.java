@@ -1,31 +1,40 @@
 package org.aps.engine.scenario.bop.entity;
 
-
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.aps.engine.scenario.bop.entity.OperationRouteId;
+
+import java.math.BigDecimal;
 
 @Entity
-@Setter
+@Table(name = "operation_route")
 @Getter
-@Builder
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-@Table(name = "operation")
-public class Operation {
+@AllArgsConstructor
+@Builder
+public class OperationRoute {
 
     @EmbeddedId
-    private OperationId operationId;
+    private OperationRouteId id;
+
     private String operationName;
-    private String runTime;
+
+    private Integer runTime;
     private String runTimeUom;
-    private String yield;
-    private String waitTime;
+
+    private Integer waitTime;
     private String waitTimeUom;
-    private String transferTime;
+
+    private Integer transferTime;
     private String transferTimeUom;
-    private String operationSeq;
+
+    private Integer operationSeq;
     private String operationType;
+
     private String sourcingType;
+
+    private Double  yield;
 }

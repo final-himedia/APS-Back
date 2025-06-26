@@ -13,6 +13,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ToolMasterId implements Serializable {
     private String toolId;
-    private String scenarioId;
     private String siteId;
+    private String scenarioId;
 }

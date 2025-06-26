@@ -20,17 +20,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BopController {
     private final RoutingRepository routingRepository;
-    private final OperationRepository operationRepository;
     private final PartRepository partRepository;
     private final BomRepository bomRepository;
     private final SiteRepository siteRepository;
-    private final OperationRoutingRepository operationRoutingRepository;
     private final BomService bomService;
     private final RoutingService routingService;
-    private final OperationService operationService;
-    private final OperationRoutingService operationRoutingService;
     private final PartService partService;
     private final SiteService siteService;
+    private final OperationRouteRepository operationRouteRepository;
+    private final OperationRouteService operationRouteService;
+
 
 
     // 시나리오 ID 별로 조회
@@ -42,18 +41,6 @@ public class BopController {
         response.put("status", 200);
         response.put("routings", routings);
         response.put("total", routings.size());
-
-        return ResponseEntity.status(200).body(response);
-    }
-
-    @GetMapping("/operation/{scenarioId}")
-    public ResponseEntity<?> getAllOperation(@PathVariable String scenarioId) {
-        List<Operation> operations = operationRepository.findByOperationIdScenarioId(scenarioId);
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", 200);
-        response.put("operations", operations);
-        response.put("total", operations.size());
 
         return ResponseEntity.status(200).body(response);
     }
@@ -94,55 +81,38 @@ public class BopController {
         return ResponseEntity.status(200).body(response);
     }
 
-    @GetMapping("/operationRouting/{scenarioId}")
-    public ResponseEntity<?> getAllOperationRouting(@PathVariable String scenarioId) {
-        List<OperationRouting> operationRoutings = operationRoutingRepository.findByOperationRoutingIdScenarioId(scenarioId);
+    @GetMapping("/operationRoute/{scenarioId}")
+    public ResponseEntity<?> getAllOperationRoute(@PathVariable String scenarioId) {
+        List<OperationRoute> operationRoutes = operationRouteRepository.findById_ScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
-        response.put("operationRoutings", operationRoutings);
-        response.put("total", operationRoutings.size());
+        response.put("operationRoute", operationRoutes);
+        response.put("total", operationRoutes.size());
 
         return ResponseEntity.status(200).body(response);
     }
 
-    @PostMapping("/bom-save")
-    public ResponseEntity<?> saveBom(@RequestBody List<Bom> boms) {
-        List<Bom> saved = bomRepository.saveAll(boms);
-        return ResponseEntity.ok(Map.of(
-                "status", 200,
-                "message", "저장 완료"
-        ));
-    }
 
-    @DeleteMapping("/bom-delete")
-    public ResponseEntity<?> deleteBom(@RequestBody List<BomId> ids) {
-        bomRepository.deleteAllById(ids);
-        return ResponseEntity.ok(Map.of(
-                "status", 200,
-                "message", "삭제 완료",
-                "deletedIds", ids
-        ));
-    }
+//    @PostMapping("/bom-save")
+//    public ResponseEntity<?> saveBom(@RequestBody List<Bom> boms) {
+//        List<Bom> saved = bomRepository.saveAll(boms);
+//        return ResponseEntity.ok(Map.of(
+//                "status", 200,
+//                "message", "저장 완료"
+//        ));
+//    }
+//
+//    @DeleteMapping("/bom-delete")
+//    public ResponseEntity<?> deleteBom(@RequestBody List<BomId> ids) {
+//        bomRepository.deleteAllById(ids);
+//        return ResponseEntity.ok(Map.of(
+//                "status", 200,
+//                "message", "삭제 완료",
+//                "deletedIds", ids
+//        ));
+//    }
 
-    @PostMapping("/operation-save")
-    public ResponseEntity<?> saveOperation(@RequestBody List<Operation> operations) {
-        List<Operation> saved = operationRepository.saveAll(operations);
-        return ResponseEntity.ok(Map.of(
-                "status", 200,
-                "message", "저장 완료"
-        ));
-    }
-
-    @DeleteMapping("/operation-delete")
-    public ResponseEntity<?> deleteOperation(@RequestBody List<OperationId> ids) {
-        operationRepository.deleteAllById(ids);
-        return ResponseEntity.ok(Map.of(
-                "status", 200,
-                "message", "삭제 완료",
-                "deletedIds", ids
-        ));
-    }
 
     @PostMapping("/part-save")
     public ResponseEntity<?> savePart(@RequestBody List<Part> parts) {
@@ -163,6 +133,25 @@ public class BopController {
         ));
     }
 
+    @PostMapping("/operationRoute-save")
+    public ResponseEntity<?> saveOperationRoute(@RequestBody List<OperationRoute> operationRoutes) {
+        List<OperationRoute> saved = operationRouteRepository.saveAll(operationRoutes);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "저장 완료"
+        ));
+    }
+
+    @DeleteMapping("/operationRoute-delete")
+    public ResponseEntity<?> deleteOperationRouteByIdList(@RequestBody List<OperationRouteId> ids) {
+        operationRouteRepository.deleteAllById(ids);
+        return ResponseEntity.ok(Map.of(
+                "status", 200,
+                "message", "삭제 완료",
+                "deletedIds", ids
+        ));
+    }
+
     @PostMapping("/bom-upload")
     public ResponseEntity<String> uploadBomExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String scenarioId) throws IOException {
         bomService.excelHandle(file, scenarioId);
@@ -175,26 +164,6 @@ public class BopController {
     }
 
 
-    @PostMapping("/operation-upload")
-    public ResponseEntity<String > uploadOperationExcel(@RequestParam("file") MultipartFile file, @RequestParam("scenarioId") String scenarioId) throws IOException {
-        operationService.excelHandle(file, scenarioId);
-        return ResponseEntity.ok("엑셀 업로드 완료");
-    }
-
-    @GetMapping("/operation-download")
-    private void downloadOperationExcel( @RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
-        operationService.exportOperationExcel(scenarioId,response);
-    }
-    @PostMapping("/operation-routing-upload")
-    public ResponseEntity<String > uploadOperationRoutingExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
-        operationRoutingService.excelHandle(file,scenarioId);
-        return ResponseEntity.ok("엑셀 업로드 완료");
-    }
-
-    @GetMapping("/operation-routing-download")
-    private void downloadOperationRoutingExcel(@RequestParam("scenarioId") String scenarioId,HttpServletResponse response) throws IOException {
-        operationRoutingService.exportOperationRoutingExcel(scenarioId,response);
-    }
     @PostMapping("/part-upload")
     public ResponseEntity<String > uploadPartExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
         partService.excelHandle(file, scenarioId);
@@ -224,5 +193,16 @@ public class BopController {
     @GetMapping("/routing-download")
     private void downloadRoutingExcel(@RequestParam("scenarioId") String scenarioId,HttpServletResponse response) throws IOException {
         routingService.exportRoutingExcel(scenarioId,response);
+    }
+
+    @PostMapping("/operationRoute-upload")
+    public ResponseEntity<String > uploadOperationRouteExcel(@RequestParam("file") MultipartFile file,@RequestParam("scenarioId") String scenarioId) throws IOException {
+        operationRouteService.operationRouteExcelHandle(file,scenarioId);
+        return ResponseEntity.ok("엑셀 업로드 완료");
+    }
+
+    @GetMapping("/operationRoute-download")
+    private void downloadOperationRouteExcel(@RequestParam("scenarioId") String scenarioId,HttpServletResponse response) throws IOException {
+        operationRouteService.exportOperationRouteExcel(scenarioId,response);
     }
 }

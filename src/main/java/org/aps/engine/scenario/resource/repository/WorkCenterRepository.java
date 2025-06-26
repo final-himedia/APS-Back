@@ -12,4 +12,10 @@ public interface WorkCenterRepository extends JpaRepository<WorkCenter, String> 
     List<WorkCenter> findByWorkCenterIdScenarioId(String scenarioId);
 
 
+
+
+
+
+
+    List<WorkCenter> findAllByWorkCenterId_ScenarioId(String scenarioId);
 }

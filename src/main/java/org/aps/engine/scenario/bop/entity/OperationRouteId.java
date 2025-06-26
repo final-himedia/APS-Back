@@ -6,15 +6,14 @@ import lombok.*;
 import java.io.Serializable;
 
 @Embeddable
-@Setter
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OperationRoutingId implements Serializable {
-    private String scenarioId;
+public class OperationRouteId implements Serializable {
     private String siteId;
-    private String routingId;
     private String operationId;
-    private Integer operationSeq;
+    private String scenarioId;
+    private String routingId;
 }

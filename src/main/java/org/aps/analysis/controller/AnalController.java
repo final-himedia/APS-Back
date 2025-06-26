@@ -29,9 +29,9 @@ public class AnalController {
     }
 
     // 간트차트 조회
-    @PostMapping("/gantt")
-    public ResponseEntity<?> getGanttChart(@RequestBody AnalRequest request) {
-        List<Map<String, Object>> ganttData = executionResultService.getGanttChartByCondition(request);
+    @GetMapping("/gantt")
+    public ResponseEntity<List<Map<String, Object>>> getGanttChart(@RequestParam String scenarioId) {
+        List<Map<String, Object>> ganttData = executionResultService.getGanttChartByScenario(scenarioId);
 
         if (ganttData.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -47,3 +47,4 @@ public class AnalController {
     }
 
 }
+

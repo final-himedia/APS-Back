@@ -50,9 +50,9 @@ public class BomService {
                     .toPartName(row.getCell(13) == null ? "" : formatter.formatCellValue(row.getCell(13)))
                     .fromPartName(row.getCell(14) == null ? "" : formatter.formatCellValue(row.getCell(14)))
                     .bomText(row.getCell(15) == null ? "" : formatter.formatCellValue(row.getCell(15)))
-                    .bomVersion(row.getCell(18) == null ? "" : formatter.formatCellValue(row.getCell(18)))
-                    .fromPartLevel(row.getCell(19) == null ? "" : formatter.formatCellValue(row.getCell(19)))
-                    .toPartLevel(row.getCell(20) == null ? "" : formatter.formatCellValue(row.getCell(20)))
+                    .bomVersion(row.getCell(17) == null ? "" : formatter.formatCellValue(row.getCell(18)))
+                    .fromPartLevel(row.getCell(18) == null ? "" : formatter.formatCellValue(row.getCell(19)))
+                    .toPartLevel(row.getCell(19) == null ? "" : formatter.formatCellValue(row.getCell(20)))
                     .build();
 
             bomRepository.save(bom);

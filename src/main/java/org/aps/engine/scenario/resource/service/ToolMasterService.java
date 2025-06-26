@@ -40,7 +40,7 @@ public class ToolMasterService {
             Integer cavity = cavityStr.isEmpty() ? 0 : Integer.valueOf(cavityStr);
 
             String toolState = row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(2));
-            String toolName = row.getCell(5) == null ? "" : formatter.formatCellValue(row.getCell(4));
+            String toolName = row.getCell(4) == null ? "" : formatter.formatCellValue(row.getCell(4));
 
             ToolMaster tool = ToolMaster.builder()
                     .toolMasterId(toolMasterId)
@@ -61,7 +61,7 @@ public class ToolMasterService {
         Sheet sheet = workbook.createSheet("TOOL_MASTER");
 
         String[] headers = {
-                "site_id", "tool_id", "tool_state", "tool_cavity", "tool_name"
+                "site_id", "tool_id", "tool_state", "tool_cavity", "tool_name" ,"scenario_id"
         };
 
         Row header = sheet.createRow(0);
@@ -89,8 +89,8 @@ public class ToolMasterService {
             row.createCell(1).setCellValue(toolId);
             row.createCell(2).setCellValue(toolState);
             row.createCell(3).setCellValue(toolCavity);
-            row.createCell(4).setCellValue(scenarioId);
-            row.createCell(5).setCellValue(toolName);
+            row.createCell(4).setCellValue(toolName);
+            row.createCell(5).setCellValue(scenarioId);
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

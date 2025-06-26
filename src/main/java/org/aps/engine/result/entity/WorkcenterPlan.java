@@ -28,9 +28,6 @@ public class WorkcenterPlan {
     private String workcenterGroup;
     private String toolId;
     private String toolName;
-    private String fromPartId;
-    private String toPartId;
-    private String toolSize;
     private String routingId;
 }
 

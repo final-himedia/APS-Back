@@ -1,8 +1,8 @@
 package org.aps.engine.result.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 import org.aps.engine.execution.result.WorkcenterPlan;
-import org.aps.engine.result.repository.WorkcenterPlanRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +20,7 @@ public class ResultController {
     // 시나리오 ID 별로 조회
     @GetMapping("/workcenter-plan/{scenarioId}")
     public ResponseEntity<?> workcenterPlan(@PathVariable String scenarioId) {
-        List<WorkcenterPlan> plans = workcenterPlanRepository.findByScenarioId(scenarioId);
+        List<WorkcenterPlan> plans = workcenterPlanRepository.findAllByScenarioId(scenarioId);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", 200);
@@ -30,4 +30,3 @@ public class ResultController {
         return ResponseEntity.status(200).body(response);
     }
 }
-

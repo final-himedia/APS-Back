@@ -1,9 +1,10 @@
 package org.aps.engine.execution.service;
 
 import lombok.RequiredArgsConstructor;
+import org.aps.analysis.request.AnalRequest;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 
-import org.aps.engine.result.entity.WorkcenterPlan;
+import org.aps.engine.execution.result.WorkcenterPlan;
 import org.aps.engine.scenario.bop.entity.OperationRoute;
 import org.aps.engine.scenario.bop.repository.OperationRouteRepository;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
@@ -12,10 +13,12 @@ import org.aps.engine.scenario.resource.entity.WorkCenterMap;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -141,7 +144,6 @@ public class ExecutionResultService {
     }
 
 
-
     public List<OperationRoute> getRoutesByScenario(String scenarioId) {
         return operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);
     }
@@ -237,4 +239,52 @@ public class ExecutionResultService {
     }
 
 
+    // 간트차트 데이터 생성하는 메소드
+    public List<Map<String, Object>> getGanttChartByCondition(AnalRequest request) {
+
+        // 시작 날짜는 00:00:00, 종료 날짜는 23:59:59로 설정
+        LocalDateTime start = request.getStartDate().atStartOfDay();
+        LocalDateTime end = request.getEndDate().atTime(23, 59, 59);
+
+        // 시나리오 ID가 일치하고, 작업 시작/종료 시간이 조건에 부합하는 작업 계획을 모두 조회
+        List<WorkcenterPlan> plans = workcenterPlanRepository
+                .findByScenarioIdAndWorkcenterStartTimeGreaterThanEqualAndWorkcenterEndTimeLessThanEqual(
+                        request.getScenarioId(), start, end);
+
+        // 라우팅 ID를 기준으로 작업 계획 데이터를 그룹핑할 Map 생성
+        Map<String, List<WorkcenterPlan>> grouped = new LinkedHashMap<>();
+        for (WorkcenterPlan plan : plans) {
+            grouped.computeIfAbsent(plan.getRoutingId(), k -> new ArrayList<>()).add(plan);
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+        // 라우팅 그룹별로 간트 항목 생성
+        for (Map.Entry<String, List<WorkcenterPlan>> entry : grouped.entrySet()) {
+            String routingId = entry.getKey();
+
+            // 라우팅 그룹에 대한 부모 Task 생성
+            result.add(Map.of("id", routingId, "name", routingId));
+
+            // 작업 시작 시간 기준으로 정렬
+            entry.getValue().sort(Comparator.comparing(WorkcenterPlan::getWorkcenterStartTime));
+
+            // 하위 Task 항목 생성
+            for (WorkcenterPlan plan : entry.getValue()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("id", plan.getOperationId());
+                item.put("parentId", plan.getRoutingId());
+                item.put("name", plan.getOperationName());
+                item.put("workCenter", plan.getWorkcenterName());
+                item.put("tool", plan.getToolName());
+                item.put("startDate", plan.getWorkcenterStartTime().format(formatter));
+                item.put("endDate", plan.getWorkcenterEndTime().format(formatter));
+
+                result.add(item);
+            }
+        }
+
+        return result;
+    }
 }

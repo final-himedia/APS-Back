@@ -14,4 +14,6 @@ public interface WorkcenterPlanRepository extends JpaRepository<WorkcenterPlan, 
 
 
     List<WorkcenterPlan> findAllByScenarioId(String scenarioId);
+
+    void deleteAllByScenarioId(String scenarioId);
 }

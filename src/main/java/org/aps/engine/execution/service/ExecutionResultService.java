@@ -1,5 +1,6 @@
 package org.aps.engine.execution.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 
@@ -32,6 +33,7 @@ public class ExecutionResultService {
     private final WorkCenterMapRepository workCenterMapRepository;
     private final ToolMasterRepository toolMasterRepository;
 
+    @Transactional
     public List<WorkcenterPlan> simulateSchedule(String scenarioId) {
         LocalDateTime startTime = LocalDateTime.of(2025, 6, 24, 0, 0);
         List<WorkcenterPlan> resultPlans = new ArrayList<>();
@@ -138,7 +140,10 @@ public class ExecutionResultService {
             toolAvailableTime.put(selectedToolId, unitEnd);
             lastEndTimeByRouting.put(routingId, unitEnd);
         }
-
+        if (workcenterPlanRepository.findAllByScenarioId(scenarioId)!=null){
+            workcenterPlanRepository.deleteAllByScenarioId(scenarioId);
+            workcenterPlanRepository.saveAll(resultPlans);
+        }
         workcenterPlanRepository.saveAll(resultPlans);
         return resultPlans;
     }

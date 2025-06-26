@@ -1,16 +1,15 @@
 package org.aps.engine.execution.repository;
 
-import org.aps.engine.execution.result.WorkcenterPlan;
-import org.aps.engine.scenario.bop.entity.OperationRoute;
+
+import org.aps.engine.result.entity.workcenterPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface WorkcenterPlanRepository extends JpaRepository<WorkcenterPlan, Integer > {
+public interface WorkcenterPlanRepository extends JpaRepository<workcenterPlan, Integer > {
 
 
-    List<WorkcenterPlan> findAllByScenarioId(String scenarioId);
+    List<workcenterPlan> findAllByScenarioId(String scenarioId);
 }

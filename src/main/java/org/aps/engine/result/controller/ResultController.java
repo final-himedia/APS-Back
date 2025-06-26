@@ -1,7 +1,7 @@
 package org.aps.engine.result.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.aps.engine.result.entity.WorkcenterPlan;
+import org.aps.engine.execution.result.WorkcenterPlan;
 import org.aps.engine.result.repository.WorkcenterPlanRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

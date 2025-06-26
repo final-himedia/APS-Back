@@ -2,7 +2,6 @@ package org.aps.engine.execution.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
-import org.aps.engine.execution.result.WorkcenterPlan;
 import org.aps.engine.execution.service.ExecutionResultService;
 import org.aps.engine.scenario.bop.entity.OperationRoute;
 import org.aps.engine.scenario.resource.entity.ToolMaster;

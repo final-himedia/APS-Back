@@ -28,5 +28,4 @@ public class WorkcenterPlan {
     private String operationType;
     private String toolId;
     private String toolName;
-    private Integer toolSize;
 }

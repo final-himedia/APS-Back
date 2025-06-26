@@ -19,7 +19,6 @@ public class OperationRoute {
 
     @EmbeddedId
     private OperationRouteId id;
-    private String routingId;
 
     private String operationName;
 

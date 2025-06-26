@@ -15,4 +15,5 @@ public class OperationRouteId implements Serializable {
     private String siteId;
     private String operationId;
     private String scenarioId;
+    private String routingId;
 }

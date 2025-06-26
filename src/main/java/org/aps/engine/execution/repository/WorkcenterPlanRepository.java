@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface WorkcenterPlanRepository extends JpaRepository<WorkcenterPlan, Integer > {
 
+
+    List<WorkcenterPlan> findAllByScenarioId(String scenarioId);
 }

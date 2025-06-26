@@ -29,7 +29,6 @@ public class WorkCenterMapService {
 
 
             WorkCenterMap workCenterMap = WorkCenterMap.builder()
-                    .routingId(row.getCell(0) == null ? "" : formatter.formatCellValue(row.getCell(1)))
                     .partId(row.getCell(1) == null ? "" : formatter.formatCellValue(row.getCell(2)))
                     .routingGroup(row.getCell(2) == null ? "" : formatter.formatCellValue(row.getCell(4)))
                     .routingVersion(row.getCell(3) == null ? "" : formatter.formatCellValue(row.getCell(5)))
@@ -66,8 +65,6 @@ public class WorkCenterMapService {
 
 
 
-
-            row.createCell(1).setCellValue(map.getRoutingId() == null ? "" : map.getRoutingId());
             row.createCell(2).setCellValue(map.getPartId() == null ? "" : map.getPartId());
             row.createCell(3).setCellValue(map.getRoutingGroup() == null ? "" : map.getRoutingGroup());
             row.createCell(4).setCellValue(map.getRoutingVersion() == null ? "" : map.getRoutingVersion());

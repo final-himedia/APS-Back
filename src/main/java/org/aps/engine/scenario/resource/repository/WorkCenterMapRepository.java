@@ -13,5 +13,6 @@ public interface WorkCenterMapRepository extends JpaRepository<WorkCenterMap, St
     @Query("SELECT wm FROM WorkCenterMap wm WHERE wm.workCenter.workCenterId.scenarioId = :scenarioId")
     List<WorkCenterMap> findByWorkCenterScenarioId(@Param("scenarioId") String scenarioId);
 
-    List<WorkCenterMap> findByRoutingId(String routingId);
+
+    List<WorkCenterMap> findByOperationRoute_Id_RoutingIdAndOperationRoute_Id_ScenarioId(String routingId, String scenarioId);
 }

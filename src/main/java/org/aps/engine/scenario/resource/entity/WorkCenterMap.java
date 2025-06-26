@@ -14,7 +14,6 @@ import org.aps.engine.scenario.bop.entity.OperationRoute;
 public class WorkCenterMap {
 
     @Id
-    private String routingId;
     private String partId;
     private String routingGroup;
     private String routingVersion;
@@ -33,10 +32,10 @@ public class WorkCenterMap {
     @JoinColumns({
             @JoinColumn(name = "site_id", referencedColumnName = "siteId", insertable = false, updatable = false),
             @JoinColumn(name = "operation_id", referencedColumnName = "operationId", insertable = false, updatable = false),
-            @JoinColumn(name = "scenario_id", referencedColumnName = "scenarioId", insertable = false, updatable = false)
+            @JoinColumn(name = "scenario_id", referencedColumnName = "scenarioId", insertable = false, updatable = false),
+            @JoinColumn(name = "routing_id", referencedColumnName = "routingId", insertable = false, updatable = false)
     })
     private OperationRoute operationRoute;
-
 
 
 }

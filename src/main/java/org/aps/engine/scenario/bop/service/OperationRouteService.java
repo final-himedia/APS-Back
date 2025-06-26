@@ -50,11 +50,11 @@ public class OperationRouteService {
                     .siteId(siteId)
                     .operationId(operationId)
                     .scenarioId(scenarioId)
+                    .routingId(routingId)
                     .build();
 
             OperationRoute operationRoute = OperationRoute.builder()
                     .id(id)
-                    .routingId(routingId)
                     .operationName(operationName)
                     .runTime(runTime)
                     .runTimeUom(runTimeUom)
@@ -99,7 +99,7 @@ public class OperationRouteService {
 
             row.createCell(0).setCellValue(id.getSiteId());
             row.createCell(1).setCellValue(id.getOperationId());
-            row.createCell(2).setCellValue(route.getRoutingId());
+            row.createCell(2).setCellValue(id.getRoutingId());
             row.createCell(3).setCellValue(route.getOperationName());
             row.createCell(4).setCellValue(route.getRunTime() != null ? route.getRunTime() : 0);
             row.createCell(5).setCellValue(route.getRunTimeUom());

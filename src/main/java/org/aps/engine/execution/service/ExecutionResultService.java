@@ -54,7 +54,6 @@ public class ExecutionResultService {
             toolMap.put(toolId, tool);
         }
 
-
         // 2. WorkCenter 초기화
         Map<String, LocalDateTime> workcenterAvailableTime = new HashMap<>();
         Map<String, WorkCenter> workcenterMap = new HashMap<>();
@@ -64,17 +63,24 @@ public class ExecutionResultService {
             workcenterMap.put(wcId, wc);
         }
 
-        // 3. OperationRoute를 operationSeq 순서대로 전부 가져오기 (라우팅 무시)
+        // 3. OperationRoute를 operationSeq 순서대로 전부 가져오기
         List<OperationRoute> operationRoutes = operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);
 
-        // 라우팅별 마지막 작업 완료 시간 기록 (필요하면 유지, 없으면 무시)
+        // 라우팅별 마지막 작업 완료 시간 기록
         Map<String, LocalDateTime> lastEndTimeByRouting = new HashMap<>();
 
         for (OperationRoute route : operationRoutes) {
             String routingId = route.getId().getRoutingId();
 
-            // 이 operation에 해당하는 WorkCenterMap들 (라우팅, 시나리오 조건)
-            List<WorkCenterMap> wcMaps = workCenterMapRepository.findByOperationRoute_Id_RoutingIdAndOperationRoute_Id_ScenarioId(routingId, scenarioId);
+            // 이 operation에 해당하는 WorkCenterMap들
+            List<WorkCenterMap> wcMaps = workCenterMapRepository
+                    .findByOperationRoute_Id_RoutingIdAndOperationRoute_Id_ScenarioId(routingId, scenarioId);
+
+            // ✅ WorkCenterMap 없으면 스킵
+            if (wcMaps == null || wcMaps.isEmpty()) {
+                System.out.println("[WARN] Skipping route because no WorkCenterMap: routingId=" + routingId + ", scenarioId=" + scenarioId);
+                continue;
+            }
 
             String selectedWorkcenterId = null;
             WorkCenterMap selectedWcMap = null;
@@ -86,7 +92,6 @@ public class ExecutionResultService {
                 LocalDateTime wcReady = workcenterAvailableTime.getOrDefault(wcId, startTime);
                 LocalDateTime prevOpEnd = lastEndTimeByRouting.getOrDefault(routingId, startTime);
 
-                // 이전 작업 종료 및 워크센터 가용시간 고려
                 LocalDateTime candidateStart = Collections.max(Arrays.asList(wcReady, prevOpEnd));
 
                 if (selectedStart == null || candidateStart.isBefore(selectedStart)) {
@@ -96,7 +101,7 @@ public class ExecutionResultService {
                 }
             }
 
-            // 툴 선택: 가장 빨리 준비된 툴 선택
+            // 툴 선택: 가장 빨리 준비된 툴
             String selectedToolId = null;
             LocalDateTime earliestToolReady = null;
             for (String toolId : toolAvailableTime.keySet()) {
@@ -146,19 +151,22 @@ public class ExecutionResultService {
             toolAvailableTime.put(selectedToolId, unitEnd);
             lastEndTimeByRouting.put(routingId, unitEnd);
         }
-        if (workcenterPlanRepository.findAllByScenarioId(scenarioId)!=null){
+
+        // 저장
+        if (workcenterPlanRepository.findAllByScenarioId(scenarioId) != null) {
             workcenterPlanRepository.deleteAllByScenarioId(scenarioId);
-            workcenterPlanRepository.saveAll(resultPlans);
         }
         workcenterPlanRepository.saveAll(resultPlans);
+
         LocalDateTime finishEngine = LocalDateTime.now();
 
-        return  AnalResponse.builder().
-                plans(resultPlans).
-                endTime(finishEngine).
-                startTime(startTime).
-                build();
+        return AnalResponse.builder()
+                .plans(resultPlans)
+                .endTime(finishEngine)
+                .startTime(startTime)
+                .build();
     }
+
 
 
 

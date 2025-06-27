@@ -3,12 +3,12 @@ package org.aps.analysis.controller;
 import lombok.RequiredArgsConstructor;
 import org.aps.analysis.entity.Anal;
 import org.aps.analysis.repository.AnalRepository;
-import org.aps.analysis.request.AnalRequest;
 import org.aps.analysis.service.AnalService;
 import org.aps.engine.execution.service.ExecutionResultService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +28,26 @@ public class AnalController {
         return ResponseEntity.ok(saveAnal);
     }
 
+    @GetMapping("get/{scenarioId}")
+    public ResponseEntity<?> getAnalByScenarioId(@PathVariable("scenarioId") String s){
+        List<Anal> anals = analRepository.findAllByScenarioId(s);
+        return ResponseEntity.ok(anals);
+
+    }
+
+    // 실행 이력 전체 목록 조회
+    @GetMapping("/list")
+    public ResponseEntity<?> getAllAnal() {
+        List<Anal> allAnal = analService.getAllAnal();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("analList", allAnal);
+        response.put("total", allAnal.size());
+
+        return ResponseEntity.ok(response);
+    }
+
     // 간트차트 조회
     @GetMapping("/gantt")
     public ResponseEntity<List<Map<String, Object>>> getGanttChart(@RequestParam String scenarioId) {
@@ -38,13 +58,5 @@ public class AnalController {
         }
         return ResponseEntity.ok(ganttData);
     }
-
-    @GetMapping("get/{scenarioId}")
-    public ResponseEntity<?> getAnalByScenarioId(@PathVariable("scenarioId") String s){
-        List<Anal> anals = analRepository.findAllByScenarioId(s);
-        return ResponseEntity.ok(anals);
-
-    }
-
 }
 

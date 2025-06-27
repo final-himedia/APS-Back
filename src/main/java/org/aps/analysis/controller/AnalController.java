@@ -1,5 +1,6 @@
 package org.aps.analysis.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.aps.analysis.entity.Anal;
 import org.aps.analysis.repository.AnalRepository;
@@ -8,6 +9,7 @@ import org.aps.engine.execution.service.ExecutionResultService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class AnalController {
     }
 
     @GetMapping("get/{scenarioId}")
-    public ResponseEntity<?> getAnalByScenarioId(@PathVariable("scenarioId") String s){
+    public ResponseEntity<?> getAnalByScenarioId(@PathVariable("scenarioId") String s) {
         List<Anal> anals = analRepository.findAllByScenarioId(s);
         return ResponseEntity.ok(anals);
 
@@ -46,6 +48,12 @@ public class AnalController {
         response.put("total", allAnal.size());
 
         return ResponseEntity.ok(response);
+    }
+
+    // 실행 이력 다운로드
+    @GetMapping("/download")
+    public void downloadAnalExcel(@RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
+        analService.exportAnalExcel(scenarioId, response);
     }
 
     // 간트차트 조회

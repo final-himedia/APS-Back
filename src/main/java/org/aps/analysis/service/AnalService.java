@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,11 @@ public class AnalService {
                 .build();
 
         return analRepository.save(anal);
+    }
+
+    // 실행 이력 전체 조회
+    public List<Anal> getAllAnal() {
+        return analRepository.findAll();
     }
 }
 

@@ -3,6 +3,7 @@ package org.aps.engine.result.controller;
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
 import org.aps.engine.execution.result.WorkcenterPlan;
+import org.aps.engine.scenario.service.ScenarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,15 @@ import java.util.Map;
 @RequestMapping("/api/result")
 @RequiredArgsConstructor
 public class ResultController {
+
     private final WorkcenterPlanRepository workcenterPlanRepository;
+    private final ScenarioService scenarioService;
+
+    // 시나리오 전체 목록 조회
+    @GetMapping("/scenarios")
+    public ResponseEntity<?> scenarioListForResult() {
+        return scenarioService.allScenarios();
+    }
 
     // 시나리오 ID 별로 조회
     @GetMapping("/workcenter-plan/{scenarioId}")
@@ -29,4 +38,5 @@ public class ResultController {
 
         return ResponseEntity.status(200).body(response);
     }
+
 }

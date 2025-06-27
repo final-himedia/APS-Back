@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -59,8 +61,15 @@ public class AnalService {
     }
 
     // 실행 이력 전체 조회
-    public List<Anal> getAllAnal() {
-        return analRepository.findAll();
+    public Map<String, Object> getAnalByScenarioId(String scenarioId) {
+        List<Anal> anals = analRepository.findAllByScenarioId(scenarioId);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("analList", anals);
+        response.put("total", anals.size());
+
+        return response;
     }
 
     // 실행 이력 다운로드
@@ -100,6 +109,18 @@ public class AnalService {
         workbook.close();
     }
 
+    // 식행 이력 삭제
+    public Map<String, Object> deleteAnal(String scenarioId) {
+        List<Anal> deleteList = analRepository.findAllByScenarioId(scenarioId);
+        analRepository.deleteAll(deleteList);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", 200);
+        response.put("message", "삭제 완료");
+        response.put("deleted", deleteList.size());
+
+        return response;
+    }
 }
 
 

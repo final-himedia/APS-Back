@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface AnalRepository extends JpaRepository<Anal, Long> {
     List<Anal> findAllByScenarioId(String s);
+
+    // 최신순으로 정렬
+    List<Anal> findAllByOrderByIdDesc();
+
 }

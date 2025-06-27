@@ -40,20 +40,22 @@ public class AnalController {
     // 실행 이력 전체 목록 조회
     @GetMapping("/list")
     public ResponseEntity<?> getAllAnal() {
-        List<Anal> allAnal = analService.getAllAnal();
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", 200);
-        response.put("analList", allAnal);
-        response.put("total", allAnal.size());
-
-        return ResponseEntity.ok(response);
+        List<Anal> allAnal = analRepository.findAllByOrderByIdDesc();
+        return ResponseEntity.ok(allAnal);
     }
 
     // 실행 이력 다운로드
     @GetMapping("/download")
     public void downloadAnalExcel(@RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
         analService.exportAnalExcel(scenarioId, response);
+    }
+
+    // 실행 이력 삭제
+    @DeleteMapping("/delete/{scenarioId}")
+    public ResponseEntity<?> deleteAnal(@PathVariable("scenarioId") String scenarioId) {
+        List<Anal> delete = analRepository.findAllByScenarioId(scenarioId);
+        analRepository.deleteAll(delete);
+        return ResponseEntity.ok(delete);
     }
 
     // 간트차트 조회

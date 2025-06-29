@@ -8,6 +8,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aps.analysis.entity.Anal;
 import org.aps.analysis.repository.AnalRepository;
+import org.aps.engine.execution.repository.WorkcenterPlanRepository;
+import org.aps.engine.execution.result.WorkcenterPlan;
 import org.aps.engine.execution.service.ExecutionResultService;
 import org.aps.engine.response.AnalResponse;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.Map;
 public class AnalService {
     private final ExecutionResultService executionResultService;
     private final AnalRepository analRepository;
+    private final WorkcenterPlanRepository workcenterPlanRepository;
 
     public Anal runSimulationAndSaveAnal(String scenarioId, String userId) {
         LocalDateTime start = LocalDateTime.now();
@@ -121,6 +124,42 @@ public class AnalService {
 
         return response;
     }
+
+    public void exportWorkCenterExcel(String scenarioId, HttpServletResponse response) throws IOException {
+        List<WorkcenterPlan> plans = workcenterPlanRepository.findAllByScenarioId(scenarioId);
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("WORKCENTER_" + scenarioId);
+
+        // ✅ 엑셀 헤더
+        String[] headers = {
+                "순번", "작업장 ID", "작업장 이름", "작업장 그룹", "자동화"
+        };
+
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            headerRow.createCell(i).setCellValue(headers[i]);
+        }
+
+        // ✅ 엑셀 내용
+        int rowIdx = 1;
+        for (WorkcenterPlan plan : plans) {
+            Row row = sheet.createRow(rowIdx++);
+            row.createCell(0).setCellValue(plan.getNo() != null ? plan.getNo() : 0);
+            row.createCell(1).setCellValue(plan.getWorkcenterId() != null ? plan.getWorkcenterId() : "");
+            row.createCell(2).setCellValue(plan.getWorkcenterName() != null ? plan.getWorkcenterName() : "");
+            row.createCell(3).setCellValue(plan.getWorkcenterGroup() != null ? plan.getWorkcenterGroup() : "");
+            row.createCell(4).setCellValue("auto");  // ✅ 자동화 컬럼 고정값
+        }
+
+        // ✅ 응답 헤더
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=workcenter_" + scenarioId + ".xlsx");
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
+
 }
 
 

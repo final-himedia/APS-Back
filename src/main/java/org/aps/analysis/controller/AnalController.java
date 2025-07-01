@@ -68,5 +68,9 @@ public class AnalController {
         }
         return ResponseEntity.ok(ganttData);
     }
+    @GetMapping("/workcenter-download")
+    public void downloadWorkcenterExcel(@RequestParam("scenarioId") String scenarioId, HttpServletResponse response) throws IOException {
+        analService.exportWorkCenterExcel(scenarioId, response);
+    }
 }
 

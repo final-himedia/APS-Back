@@ -2,12 +2,8 @@ package org.aps.engine.execution.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.aps.analysis.entity.Anal;
 import org.aps.analysis.repository.AnalRepository;
-import org.aps.analysis.request.AnalRequest;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
-
-
 import org.aps.engine.execution.result.WorkcenterPlan;
 import org.aps.engine.response.AnalResponse;
 import org.aps.engine.scenario.bop.entity.OperationRoute;
@@ -18,7 +14,6 @@ import org.aps.engine.scenario.resource.entity.WorkCenterMap;
 import org.aps.engine.scenario.resource.repository.ToolMasterRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterMapRepository;
 import org.aps.engine.scenario.resource.repository.WorkCenterRepository;
-import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -65,7 +60,6 @@ public class ExecutionResultService {
 
         // 3. OperationRoute 가져오기
         List<OperationRoute> operationRoutes = operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);
-
         Map<String, LocalDateTime> lastEndTimeByRouting = new HashMap<>();
 
         for (OperationRoute route : operationRoutes) {
@@ -75,7 +69,7 @@ public class ExecutionResultService {
                     .findByOperationRoute_Id_RoutingIdAndOperationRoute_Id_ScenarioId(routingId, scenarioId);
 
             if (wcMaps == null || wcMaps.isEmpty()) {
-                System.out.println("[WARN] Skipping route because no WorkCenterMap: routingId=" + routingId + ", scenarioId=" + scenarioId);
+                System.out.println("[WARN] Skipping route because no WorkCenterMap: routingId=" + routingId);
                 continue;
             }
 
@@ -83,28 +77,37 @@ public class ExecutionResultService {
             WorkCenterMap selectedWcMap = null;
             LocalDateTime selectedStart = null;
 
-            // 가장 빠른 워크센터 사용 가능 시간 찾기
+            // ✅ 가장 빠른 워크센터 중 랜덤 선택
+            LocalDateTime earliestWcReady = null;
+            List<String> earliestWcIds = new ArrayList<>();
+            Map<String, WorkCenterMap> wcMapById = new HashMap<>();
+
             for (WorkCenterMap wcMap : wcMaps) {
                 String wcId = wcMap.getWorkCenter().getWorkCenterId().getWorkcenterId();
                 LocalDateTime wcReady = workcenterAvailableTime.getOrDefault(wcId, startTime);
                 LocalDateTime prevOpEnd = lastEndTimeByRouting.getOrDefault(routingId, startTime);
+                LocalDateTime candidateStart = wcReady.isAfter(prevOpEnd) ? wcReady : prevOpEnd;
 
-                LocalDateTime candidateStart = Collections.max(Arrays.asList(wcReady, prevOpEnd));
-
-                if (selectedStart == null || candidateStart.isBefore(selectedStart)) {
-                    selectedStart = candidateStart;
-                    selectedWorkcenterId = wcId;
-                    selectedWcMap = wcMap;
+                if (earliestWcReady == null || candidateStart.isBefore(earliestWcReady)) {
+                    earliestWcReady = candidateStart;
+                    earliestWcIds.clear();
+                    earliestWcIds.add(wcId);
+                } else if (candidateStart.equals(earliestWcReady)) {
+                    earliestWcIds.add(wcId);
                 }
+                wcMapById.put(wcId, wcMap);
             }
 
-            // ✅ 수정된 툴 선택 로직: 가장 이른 툴들 중 랜덤
+            Random random = new Random();
+            selectedWorkcenterId = earliestWcIds.get(random.nextInt(earliestWcIds.size()));
+            selectedStart = earliestWcReady;
+            selectedWcMap = wcMapById.get(selectedWorkcenterId);
+
+            // ✅ 툴 선택: 가장 이른 툴 중 랜덤 선택
             LocalDateTime earliestToolReady = null;
             List<String> earliestTools = new ArrayList<>();
-
             for (String toolId : toolAvailableTime.keySet()) {
                 LocalDateTime toolReady = toolAvailableTime.get(toolId);
-
                 if (earliestToolReady == null || toolReady.isBefore(earliestToolReady)) {
                     earliestToolReady = toolReady;
                     earliestTools.clear();
@@ -113,12 +116,10 @@ public class ExecutionResultService {
                     earliestTools.add(toolId);
                 }
             }
-
-            String selectedToolId = earliestTools.get(new Random().nextInt(earliestTools.size()));
+            String selectedToolId = earliestTools.get(random.nextInt(earliestTools.size()));
             LocalDateTime toolReady = toolAvailableTime.get(selectedToolId);
 
             LocalDateTime startAt = Collections.max(Arrays.asList(selectedStart, toolReady));
-
             double procTimeHour;
             try {
                 procTimeHour = Double.parseDouble(selectedWcMap.getProcTime());
@@ -148,7 +149,6 @@ public class ExecutionResultService {
 
             resultPlans.add(plan);
 
-            // 리소스 사용 가능 시간 갱신
             workcenterAvailableTime.put(selectedWorkcenterId, unitEnd);
             toolAvailableTime.put(selectedToolId, unitEnd);
             lastEndTimeByRouting.put(routingId, unitEnd);
@@ -167,6 +167,65 @@ public class ExecutionResultService {
                 .startTime(startTime)
                 .build();
     }
+
+    public List<Map<String, Object>> getTop5Operations(String scenarioId) {
+        List<WorkcenterPlan> plans = workcenterPlanRepository.findAllByScenarioId(scenarioId);
+
+        return plans.stream().map(plan -> {
+                    long durationMinutes = Duration.between(
+                            plan.getWorkcenterStartTime(),
+                            plan.getWorkcenterEndTime()
+                    ).toMinutes();
+
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("routingId", plan.getRoutingId());
+                    item.put("operationId", plan.getOperationId());
+                    item.put("operationName", plan.getOperationName());
+                    item.put("durationMinutes", durationMinutes);
+                    item.put("workcenter", plan.getWorkcenterName());
+                    return item;
+                })
+                .sorted((a, b) -> Long.compare(
+                        (Long) b.get("durationMinutes"),
+                        (Long) a.get("durationMinutes")
+                ))
+                .limit(5)
+                .collect(Collectors.toList());
+    }
+
+
+
+    public List<Map<String, Object>> getTotalTimeRouting(String scenarioId) {
+        List<WorkcenterPlan> plans = workcenterPlanRepository.findAllByScenarioId(scenarioId);
+
+        Map<String, Long> totalDurationPerRouting = new HashMap<>();
+
+        for (WorkcenterPlan plan : plans) {
+            long durationMinutes = Duration.between(
+                    plan.getWorkcenterStartTime(),
+                    plan.getWorkcenterEndTime()
+            ).toMinutes();
+
+            String routingId = plan.getRoutingId();
+
+            totalDurationPerRouting.put(
+                    routingId,
+                    totalDurationPerRouting.getOrDefault(routingId, 0L) + durationMinutes
+            );
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : totalDurationPerRouting.entrySet()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("routingId", entry.getKey());
+            map.put("totalDurationMinutes", entry.getValue());
+            result.add(map);
+        }
+
+        return result;
+    }
+
+
 
 
     public List<OperationRoute> getRoutesByScenario(String scenarioId) {

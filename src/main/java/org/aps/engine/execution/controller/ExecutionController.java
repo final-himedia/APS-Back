@@ -2,6 +2,7 @@ package org.aps.engine.execution.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.aps.engine.execution.repository.WorkcenterPlanRepository;
+import org.aps.engine.execution.result.WorkcenterPlan;
 import org.aps.engine.execution.service.ExecutionResultService;
 import org.aps.engine.scenario.bop.entity.OperationRoute;
 import org.aps.engine.scenario.resource.entity.ToolMaster;
@@ -52,4 +53,13 @@ public class ExecutionController {
         return ResponseEntity.ok(toolMasters);
     }
 
+    @GetMapping("/top5-operation")
+    public List<Map<String, Object>> getTopOperation(@RequestParam("scenarioId")String s){
+        return executionResultService.getTop5Operations(s);
+    }
+
+    @GetMapping("/total-time-routing")
+    public List<Map<String, Object>> getTotalTimeRouting(@RequestParam("scenarioId")String s){
+        return executionResultService.getTotalTimeRouting(s);
+    }
 }

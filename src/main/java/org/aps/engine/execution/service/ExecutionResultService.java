@@ -44,7 +44,7 @@ public class ExecutionResultService {
         LocalDateTime startTime = LocalDateTime.of(2025, 6, 24, 0, 0);
         List<WorkcenterPlan> resultPlans = new ArrayList<>();
 
-        // 1. Tool 초기화 (scenarioId 기준)
+        // 1. Tool 초기화
         Map<String, LocalDateTime> toolAvailableTime = new HashMap<>();
         Map<String, ToolMaster> toolMap = new HashMap<>();
         List<ToolMaster> tools = toolMasterRepository.findAllByToolMasterId_ScenarioId(scenarioId);
@@ -63,20 +63,17 @@ public class ExecutionResultService {
             workcenterMap.put(wcId, wc);
         }
 
-        // 3. OperationRoute를 operationSeq 순서대로 전부 가져오기
+        // 3. OperationRoute 가져오기
         List<OperationRoute> operationRoutes = operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);
 
-        // 라우팅별 마지막 작업 완료 시간 기록
         Map<String, LocalDateTime> lastEndTimeByRouting = new HashMap<>();
 
         for (OperationRoute route : operationRoutes) {
             String routingId = route.getId().getRoutingId();
 
-            // 이 operation에 해당하는 WorkCenterMap들
             List<WorkCenterMap> wcMaps = workCenterMapRepository
                     .findByOperationRoute_Id_RoutingIdAndOperationRoute_Id_ScenarioId(routingId, scenarioId);
 
-            // ✅ WorkCenterMap 없으면 스킵
             if (wcMaps == null || wcMaps.isEmpty()) {
                 System.out.println("[WARN] Skipping route because no WorkCenterMap: routingId=" + routingId + ", scenarioId=" + scenarioId);
                 continue;
@@ -101,20 +98,25 @@ public class ExecutionResultService {
                 }
             }
 
-            // 툴 선택: 가장 빨리 준비된 툴
-            String selectedToolId = null;
+            // ✅ 수정된 툴 선택 로직: 가장 이른 툴들 중 랜덤
             LocalDateTime earliestToolReady = null;
+            List<String> earliestTools = new ArrayList<>();
+
             for (String toolId : toolAvailableTime.keySet()) {
                 LocalDateTime toolReady = toolAvailableTime.get(toolId);
+
                 if (earliestToolReady == null || toolReady.isBefore(earliestToolReady)) {
                     earliestToolReady = toolReady;
-                    selectedToolId = toolId;
+                    earliestTools.clear();
+                    earliestTools.add(toolId);
+                } else if (toolReady.equals(earliestToolReady)) {
+                    earliestTools.add(toolId);
                 }
             }
 
+            String selectedToolId = earliestTools.get(new Random().nextInt(earliestTools.size()));
             LocalDateTime toolReady = toolAvailableTime.get(selectedToolId);
 
-            // 실제 시작 시간 = 워크센터, 툴, 이전 작업 완료 시간 중 가장 늦은 시간
             LocalDateTime startAt = Collections.max(Arrays.asList(selectedStart, toolReady));
 
             double procTimeHour;
@@ -146,13 +148,12 @@ public class ExecutionResultService {
 
             resultPlans.add(plan);
 
-            // 리소스 사용 시간 업데이트
+            // 리소스 사용 가능 시간 갱신
             workcenterAvailableTime.put(selectedWorkcenterId, unitEnd);
             toolAvailableTime.put(selectedToolId, unitEnd);
             lastEndTimeByRouting.put(routingId, unitEnd);
         }
 
-        // 저장
         if (workcenterPlanRepository.findAllByScenarioId(scenarioId) != null) {
             workcenterPlanRepository.deleteAllByScenarioId(scenarioId);
         }
@@ -166,6 +167,7 @@ public class ExecutionResultService {
                 .startTime(startTime)
                 .build();
     }
+
 
     public List<OperationRoute> getRoutesByScenario(String scenarioId) {
         return operationRouteRepository.findById_ScenarioIdOrderByOperationSeq(scenarioId);

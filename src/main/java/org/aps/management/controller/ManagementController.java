@@ -104,8 +104,8 @@ public class ManagementController {
     }
 
     // 사용자 정보 삭제
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+    @DeleteMapping("/user/{email}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String email, HttpServletRequest request) {
         User loginUser = (User) request.getAttribute("user");
 
         // 관리자가 아니면 접근 제한
@@ -113,23 +113,26 @@ public class ManagementController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
         }
 
-        // 특정 사용자 조회
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
-
-        userRepository.delete(user);
+        // 이메일 기준 사용자 조회
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다.");
+        }
 
         List<Qna> qnas = qnaRepository.findByWriterId(user.getId());
         for (Qna qna : qnas) {
-            qna.setWriterId(null); // FK 끊기 (nullable=true여야 함)
+            qna.setWriterId(null);
         }
         qnaRepository.saveAll(qnas);
 
         List<Comment> comments = commentRepository.findByWriterId(user.getId());
         for (Comment comment : comments) {
-            comment.setWriterId(null); // FK 끊기
+            comment.setWriterId(null);
         }
         commentRepository.saveAll(comments);
+
+        // 사용자 삭제
+        userRepository.delete(user);
 
         return ResponseEntity.status(204).build();
     }
@@ -196,6 +199,7 @@ public class ManagementController {
 
         return ResponseEntity.status(200).body(results);
     }
+
     @GetMapping("/qna/notice/list")
     public ResponseEntity<List<QnaResponse>> noticeQnas(@RequestParam("notice") String n) {
         List<Qna> qnas = qnaRepository.findByCategory(n);

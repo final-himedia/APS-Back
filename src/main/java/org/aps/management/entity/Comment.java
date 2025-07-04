@@ -19,6 +19,8 @@ public class Comment {
     private Integer id;
 
     private Integer qnaId;
+
+    @Column(name = "writer_id", nullable = true)
     private Long writerId;
     private String content;
     private LocalDateTime wroteAt;

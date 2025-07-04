@@ -119,6 +119,18 @@ public class ManagementController {
 
         userRepository.delete(user);
 
+        List<Qna> qnas = qnaRepository.findByWriterId(user.getId());
+        for (Qna qna : qnas) {
+            qna.setWriterId(null); // FK 끊기 (nullable=true여야 함)
+        }
+        qnaRepository.saveAll(qnas);
+
+        List<Comment> comments = commentRepository.findByWriterId(user.getId());
+        for (Comment comment : comments) {
+            comment.setWriterId(null); // FK 끊기
+        }
+        commentRepository.saveAll(comments);
+
         return ResponseEntity.status(204).build();
     }
 

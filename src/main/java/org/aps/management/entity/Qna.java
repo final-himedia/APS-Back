@@ -18,6 +18,7 @@ public class Qna {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "writer_id", nullable = true)
     private Long writerId;
     private String title;
     private String content;
